@@ -1,0 +1,191 @@
+{
+  "network": "AMEX",
+  "version": "1.0",
+  "reason_codes": {
+    "goods_not_received": {
+      "reason_code": "4553",
+      "title": "Goods or services not received",
+      "description": "Cardholder claims the goods or services were never received.",
+      "required_evidence": {
+        "order_confirmation": {
+          "weight": 0.15,
+          "description": "Proof that the order was placed and confirmed by the merchant.",
+          "examples": ["Order receipt", "Booking confirmation email", "Invoice"]
+        },
+        "delivery_tracking": {
+          "weight": 0.25,
+          "description": "Tracking record showing the shipment was dispatched and in transit.",
+          "examples": ["Courier tracking ID", "Shipping label", "Dispatch log"]
+        },
+        "delivery_signature": {
+          "weight": 0.30,
+          "description": "Proof that the item was physically delivered and received.",
+          "examples": ["Signed POD", "Delivery photo", "Digital signature log"]
+        },
+        "customer_communication": {
+          "weight": 0.15,
+          "description": "Any communication with the customer regarding the order or delivery.",
+          "examples": ["Email thread", "Chat transcript", "SMS confirmation"]
+        },
+        "transaction_metadata": {
+          "weight": 0.15,
+          "description": "Payment and transaction details matching the disputed charge.",
+          "examples": ["Payment receipt", "Order ID", "Transaction timestamp"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    },
+    "product_not_as_described": {
+      "reason_code": "4554",
+      "title": "Product or service not as described",
+      "description": "Cardholder claims the product or service differed materially from what was advertised.",
+      "required_evidence": {
+        "product_description": {
+          "weight": 0.25,
+          "description": "Original product listing or service description at time of purchase.",
+          "examples": ["Product page screenshot", "Catalog entry", "Service agreement"]
+        },
+        "customer_communication": {
+          "weight": 0.25,
+          "description": "Communication showing the merchant addressed the complaint.",
+          "examples": ["Support email", "Chat log", "Complaint resolution record"]
+        },
+        "return_policy": {
+          "weight": 0.20,
+          "description": "Merchant return or refund policy communicated to the customer.",
+          "examples": ["Return policy page", "T&C document", "Policy email"]
+        },
+        "delivery_tracking": {
+          "weight": 0.15,
+          "description": "Evidence the product was delivered.",
+          "examples": ["Tracking log", "Delivery confirmation"]
+        },
+        "transaction_metadata": {
+          "weight": 0.15,
+          "description": "Transaction details confirming the purchase.",
+          "examples": ["Payment receipt", "Order ID", "Invoice"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    },
+    "refund_not_processed": {
+      "reason_code": "4513",
+      "title": "Credit not processed",
+      "description": "Cardholder claims a refund was promised but never credited.",
+      "required_evidence": {
+        "refund_policy": {
+          "weight": 0.25,
+          "description": "Merchant refund policy stating timelines and conditions.",
+          "examples": ["Refund policy document", "Website policy screenshot"]
+        },
+        "refund_timeline": {
+          "weight": 0.25,
+          "description": "Record showing when the refund was initiated and its current status.",
+          "examples": ["Refund initiation log", "Payment gateway refund record", "Bank transfer proof"]
+        },
+        "customer_communication": {
+          "weight": 0.20,
+          "description": "Communication acknowledging the refund request and timeline.",
+          "examples": ["Refund confirmation email", "Support ticket", "Chat transcript"]
+        },
+        "transaction_metadata": {
+          "weight": 0.15,
+          "description": "Original transaction details linked to the refund.",
+          "examples": ["Transaction ID", "Payment receipt", "Order details"]
+        },
+        "merchant_terms": {
+          "weight": 0.15,
+          "description": "Merchant terms and conditions covering refund eligibility.",
+          "examples": ["T&C document", "Service agreement", "Policy page"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    },
+    "unauthorized_fraud": {
+      "reason_code": "4540",
+      "title": "Fraud or unauthorized transaction",
+      "description": "Cardholder claims the transaction was not authorized by them.",
+      "required_evidence": {
+        "customer_history": {
+          "weight": 0.20,
+          "description": "Prior purchase history from the same customer showing a pattern of legitimate use.",
+          "examples": ["Previous order records", "Account activity log", "Loyalty history"]
+        },
+        "ip_device_logs": {
+          "weight": 0.30,
+          "description": "Device and IP information at the time of transaction matching the cardholder.",
+          "examples": ["IP address log", "Device fingerprint", "Geolocation data"]
+        },
+        "authentication_signal": {
+          "weight": 0.25,
+          "description": "Evidence of authentication at the time of purchase.",
+          "examples": ["3DS authentication log", "OTP record", "Biometric confirmation"]
+        },
+        "transaction_metadata": {
+          "weight": 0.15,
+          "description": "Transaction details confirming the charge was processed correctly.",
+          "examples": ["Payment receipt", "Transaction timestamp", "Gateway response"]
+        },
+        "customer_communication": {
+          "weight": 0.10,
+          "description": "Any communication from the customer prior to the dispute.",
+          "examples": ["Order confirmation email", "Delivery notification", "Support interaction"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    },
+    "duplicate_charge": {
+      "reason_code": "4521",
+      "title": "Duplicate processing",
+      "description": "Cardholder claims they were charged more than once for the same transaction.",
+      "required_evidence": {
+        "original_transaction_id": {
+          "weight": 0.25,
+          "description": "The original transaction ID for the legitimate charge.",
+          "examples": ["Transaction receipt", "Payment gateway log", "Invoice"]
+        },
+        "duplicate_transaction_comparison": {
+          "weight": 0.35,
+          "description": "Side-by-side comparison showing the two transactions are distinct.",
+          "examples": ["Transaction comparison report", "Gateway records for both charges", "Order IDs"]
+        },
+        "settlement_record": {
+          "weight": 0.20,
+          "description": "Settlement or reconciliation record showing only one charge was intended.",
+          "examples": ["Settlement report", "Reconciliation log", "Accounting record"]
+        },
+        "customer_communication": {
+          "weight": 0.10,
+          "description": "Any communication with the customer about the charge.",
+          "examples": ["Payment confirmation email", "Support reply", "Invoice sent to customer"]
+        },
+        "transaction_metadata": {
+          "weight": 0.10,
+          "description": "Metadata confirming the transaction details.",
+          "examples": ["Payment timestamp", "Order ID", "Gateway reference"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    }
+  }
+}

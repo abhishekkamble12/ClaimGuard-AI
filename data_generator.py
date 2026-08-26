@@ -1,0 +1,233 @@
+import argparse
+import json
+import random
+from datetime import date, timedelta
+from pathlib import Path
+
+REASON_CODES = {
+    "goods_not_received": {
+        "network": "AMEX",
+        "reason_code": "4553",
+        "title": "Goods or services not received",
+        "required_evidence": {
+            "order_confirmation": 0.15,
+            "delivery_tracking": 0.25,
+            "delivery_signature": 0.30,
+            "customer_communication": 0.15,
+            "transaction_metadata": 0.15,
+        },
+    },
+    "product_not_as_described": {
+        "network": "AMEX",
+        "reason_code": "4554",
+        "title": "Product or service not as described",
+        "required_evidence": {
+            "product_description": 0.25,
+            "customer_communication": 0.25,
+            "return_policy": 0.20,
+            "delivery_tracking": 0.15,
+            "transaction_metadata": 0.15,
+        },
+    },
+    "refund_not_processed": {
+        "network": "AMEX",
+        "reason_code": "4513",
+        "title": "Credit not processed",
+        "required_evidence": {
+            "refund_policy": 0.25,
+            "refund_timeline": 0.25,
+            "customer_communication": 0.20,
+            "transaction_metadata": 0.15,
+            "merchant_terms": 0.15,
+        },
+    },
+    "unauthorized_fraud": {
+        "network": "AMEX",
+        "reason_code": "4540",
+        "title": "Fraud or unauthorized transaction",
+        "required_evidence": {
+            "customer_history": 0.20,
+            "ip_device_logs": 0.30,
+            "authentication_signal": 0.25,
+            "transaction_metadata": 0.15,
+            "customer_communication": 0.10,
+        },
+    },
+    "duplicate_charge": {
+        "network": "AMEX",
+        "reason_code": "4521",
+        "title": "Duplicate processing",
+        "required_evidence": {
+            "original_transaction_id": 0.25,
+            "duplicate_transaction_comparison": 0.35,
+            "settlement_record": 0.20,
+            "customer_communication": 0.10,
+            "transaction_metadata": 0.10,
+        },
+    },
+}
+
+MERCHANTS = ["UrbanKart India", "FitNest Wellness", "CloudKitchen Pro", "LearnLoop EdTech", "StyleForge Apparel"]
+PAYMENT_METHODS = ["card", "upi", "wallet", "netbanking"]
+STATUSES = ["present", "weak", "missing"]
+STATUS_SCORE = {"present": 1.0, "weak": 0.5, "missing": 0.0}
+
+
+def weighted_status(profile):
+    if profile == "strong":
+        return random.choices(STATUSES, weights=[72, 22, 6], k=1)[0]
+    if profile == "partial":
+        return random.choices(STATUSES, weights=[42, 38, 20], k=1)[0]
+    return random.choices(STATUSES, weights=[18, 32, 50], k=1)[0]
+
+
+def evidence_text(evidence_id, status, is_adversarial=False):
+    clean_id = evidence_id.replace("_", " ").title()
+    if is_adversarial and status == "weak":
+        # Adversarial text snippet that rule engines misclassify but LLMs extract correctly
+        ambiguous_templates = [
+            f"Courier log indicates item dropped off at building mailroom on Aug 12, but no physical customer signature collected.",
+            f"Support ticket shows customer complained about color mismatch, merchant offered 10% discount but customer didn't reply.",
+            f"IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
+            f"Refund initiated via gateway but pending bank settlement confirmation.",
+        ]
+        return random.choice(ambiguous_templates)
+    
+    if status == "present":
+        return f"Official {clean_id} uploaded by merchant. Document verifies transaction match with valid timestamp."
+    if status == "weak":
+        return f"{clean_id} is partially available. Document contains incomplete details."
+    return ""
+
+
+def score_case(required_evidence, labels):
+    score = sum(weight * STATUS_SCORE[labels[evidence_id]] for evidence_id, weight in required_evidence.items())
+    return round(score, 3)
+
+
+def confidence_case(score, labels):
+    total = len(labels)
+    if total == 0:
+        return 0.0
+    weak_ratio = sum(1 for status in labels.values() if status == "weak") / total
+    return round(max(0.0, min(1.0, score - (weak_ratio * 0.10))), 3)
+
+
+def route_case(score, confidence):
+    if score >= 0.80 and confidence >= 0.75:
+        return "auto_draft_response"
+    if score >= 0.50:
+        return "request_more_evidence"
+    return "human_review"
+
+
+def expected_outcome(score):
+    if score >= 0.82:
+        return "won"
+    if score <= 0.45:
+        return "lost"
+    return random.choices(["won", "lost"], weights=[45, 55], k=1)[0]
+
+
+def generate_case(case_number, category, profile):
+    reason = REASON_CODES[category]
+    required = reason["required_evidence"]
+    is_adversarial = (case_number % 4 == 0)  # Every 4th case is an adversarial edge case
+
+    labels = {evidence_id: weighted_status(profile) for evidence_id in required}
+
+    score = score_case(required, labels)
+    confidence = confidence_case(score, labels)
+    route = route_case(score, confidence)
+    missing = [evidence_id for evidence_id, status in labels.items() if status == "missing"]
+    weak = [evidence_id for evidence_id, status in labels.items() if status == "weak"]
+
+    payment_date = date(2026, 8, 1) + timedelta(days=random.randint(0, 20))
+    amount_inr = random.choice([499, 999, 1499, 2499, 4999, 9999])
+    amount_paise = amount_inr * 100
+
+    evidence_docs = {
+        evidence_id: evidence_text(evidence_id, status, is_adversarial=is_adversarial)
+        for evidence_id, status in labels.items()
+        if status != "missing"
+    }
+
+    dispute_id = f"disp_{1000000000000 + case_number}"
+    payment_id = f"pay_{1000000000000 + random.randint(1000, 9999)}"
+    order_id = f"order_{1000000000000 + random.randint(1000, 9999)}"
+
+    return {
+        "dispute_id": dispute_id,
+        "legacy_dispute_id": f"DSP-{case_number:04d}",
+        "merchant_id": f"acc_{random.randint(100000, 999999)}",
+        "merchant_name": random.choice(MERCHANTS),
+        "network": reason["network"],
+        "reason_code": reason["reason_code"],
+        "reason_category": category,
+        "reason_title": reason["title"],
+        "is_adversarial": is_adversarial,
+        "transaction": {
+            "amount": amount_inr,
+            "amount_paise": amount_paise,
+            "currency": "INR",
+            "payment_method": random.choice(PAYMENT_METHODS),
+            "payment_date": payment_date.isoformat(),
+            "order_id": order_id,
+            "payment_id": payment_id,
+        },
+        "evidence_documents": evidence_docs,
+        "ground_truth_evidence": labels,
+        "missing_evidence": missing,
+        "weak_evidence": weak,
+        "expected_completeness_score": score,
+        "expected_confidence": confidence,
+        "expected_route": route,
+        "expected_outcome": expected_outcome(score),
+        "split": "train",
+    }
+
+
+def generate_dataset(total_cases, test_ratio, seed):
+    random.seed(seed)
+    categories = list(REASON_CODES.keys())
+    profiles = ["strong", "partial", "weak"]
+    cases = []
+
+    for case_number in range(1, total_cases + 1):
+        category = categories[(case_number - 1) % len(categories)]
+        profile = profiles[(case_number - 1) % len(profiles)]
+        cases.append(generate_case(case_number, category, profile))
+
+    random.shuffle(cases)
+    test_count = int(total_cases * test_ratio)
+    for index, case in enumerate(cases):
+        case["split"] = "test" if index < test_count else "train"
+
+    return {
+        "dataset_name": "proofpilot_synthetic_chargeback_dataset",
+        "version": "2.1",
+        "total_cases": total_cases,
+        "train_cases": total_cases - test_count,
+        "test_cases": test_count,
+        "reason_code_config": REASON_CODES,
+        "cases": cases,
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cases", type=int, default=60)
+    parser.add_argument("--test-ratio", type=float, default=0.33)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--out", default="outputs/synthetic_chargeback_dataset.json")
+    args = parser.parse_args()
+
+    dataset = generate_dataset(args.cases, args.test_ratio, args.seed)
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(dataset, indent=2), encoding="utf-8")
+    print(f"ProofPilot dataset generated: {dataset['total_cases']} cases (with adversarial edge cases) -> {out_path}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,90 @@
+ClaimGuard AI Razorpay Buildathon Roadmap
+
+Goal:
+Build the strongest possible AI Risk Manager MVP for chargeback evidence
+readiness. The project must work end to end, be explainable in 5 minutes, and
+hold up in an architecture discussion.
+
+Build Order
+
+1. Core scoring engine
+   - Load reason-code config from JSON.
+   - Load synthetic disputes from JSON.
+   - Detect evidence status from submitted evidence documents.
+   - Score each required evidence item as present, weak, or missing.
+   - Calculate weighted completeness score and confidence.
+
+2. Risk routing gate
+   - Auto-draft only when score and confidence are high.
+   - Request more evidence for partial cases.
+   - Route weak or ambiguous cases to human review.
+   - Keep this logic simple and easy to defend.
+
+3. Evaluation metrics
+   - Route accuracy.
+   - Evidence detection precision.
+   - Evidence detection recall.
+   - Abstention rate.
+   - False-positive auto-draft rate.
+   - Predicted route distribution.
+
+4. Streamlit dashboard
+   - Select a dispute.
+   - Show reason code, merchant, amount, and evidence checklist.
+   - Show completeness score, confidence, and route.
+   - Show missing and weak evidence.
+   - Simulate adding missing evidence.
+   - Re-score immediately.
+   - Show evaluation metrics.
+
+5. Response drafting
+   - Draft only when routing_decision is auto_draft_response.
+   - Use a deterministic template for reliable demo behavior.
+   - Keep the interface LLM-ready for future Groq/OpenAI integration.
+
+6. Razorpay polish
+   - Use payment-style metadata: order ID, merchant ID, amount, currency,
+     payment method, payment date.
+   - Pitch as an AI Risk Manager for merchant dispute operations.
+   - Emphasize responsible automation and false-positive prevention.
+
+7. Final submission polish
+   - Add README run instructions.
+   - Add screenshots or short demo recording.
+   - Push to public GitHub.
+   - Prepare 5-minute pitch:
+     Problem -> Product -> Demo -> Architecture -> Metrics -> Future scope.
+
+Best Demo Moment
+
+Before:
+Completeness Score: 62%
+Decision: Request more evidence
+Missing: Delivery signature
+
+After adding evidence:
+Completeness Score: 88%
+Decision: Auto-draft response
+
+Why This Can Win
+
+- It fits the AI Risk Manager track directly.
+- It solves a real merchant pain point.
+- It is not a generic AI writer.
+- It has measurable risk metrics.
+- It demonstrates confidence-gated automation.
+- It is small enough to work reliably in a live demo.
+
+Avoid During MVP
+
+- React frontend
+- FastAPI backend
+- PostgreSQL
+- Redis/Celery
+- Qdrant
+- complex multi-agent workflows
+- too many card networks
+- live payment API dependencies
+
+Those are future-scope items. The buildathon version should be complete,
+understandable, and hard to break.
