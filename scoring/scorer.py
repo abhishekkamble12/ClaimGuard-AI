@@ -4,7 +4,8 @@ ProofPilot — Completeness Scorer & Counterfactual Risk Engine
 Loads a dispute and reason-code config, evaluates evidence statuses,
 calculates readiness score, confidence, risk tier (LOW, MEDIUM, HIGH),
 integrates ML Win Probability (scikit-learn), TF-IDF semantic relevance,
-and produces counterfactual risk improvement predictions.
+economic decision engine (CONTEST vs ACCEPT_LOSS), and produces
+counterfactual risk improvement predictions.
 """
 
 import json
@@ -19,6 +20,10 @@ if str(ROOT) not in sys.path:
 from extraction.extractor import extract_and_classify_evidence
 from ml.semantic_matcher import compute_semantic_relevance
 from ml.win_predictor import get_win_predictor
+from scoring.audit_log import log_decision
+
+# Backward-compatibility alias for tests
+infer_evidence_statuses = extract_and_classify_evidence
 
 STATUS_SCORE: dict[str, float] = {
     "present": 1.0,
@@ -32,10 +37,16 @@ DEFAULT_REQUEST_MORE_MIN_SCORE = 0.50
 
 
 def load_reason_code_config(config_path: str | Path) -> dict[str, Any]:
-    """Load reason-code config (e.g. amex.json)."""
+    """Load reason-code config from a JSON file or directory of JSON configs."""
     path = Path(config_path)
     if not path.exists():
         raise FileNotFoundError(f"Reason code config not found: {path}")
+    if path.is_dir():
+        merged = {}
+        for f in sorted(path.glob("*.json")):
+            data = json.loads(f.read_text(encoding="utf-8"))
+            merged.update(data.get("reason_codes", data))
+        return merged
     data = json.loads(path.read_text(encoding="utf-8"))
     return data.get("reason_codes", data)
 
@@ -159,6 +170,7 @@ def score_dispute(
     *,
     use_ground_truth: bool = False,
     api_key: str | None = None,
+    log_audit: bool = True,
 ) -> dict[str, Any]:
     """Score a single dispute case."""
     category = dispute.get("reason_category")
@@ -212,8 +224,9 @@ def score_dispute(
     win_probability = win_predictor.predict_win_probability(dispute, partial_result)
     disputed_amount = float(dispute.get("transaction", {}).get("amount", 1000))
     expected_value = win_predictor.calculate_expected_financial_value(disputed_amount, win_probability)
+    economic_rec = win_predictor.recommend_action(disputed_amount, win_probability)
 
-    return {
+    result = {
         "dispute_id": dispute.get("dispute_id"),
         "reason_code": rc_config.get("reason_code"),
         "reason_category": category,
@@ -232,9 +245,18 @@ def score_dispute(
         "win_probability": win_probability,
         "win_probability_pct": f"{win_probability:.0%}",
         "expected_financial_value": expected_value,
+        "economic_recommendation": economic_rec,
         "ml_model_auc": win_predictor.auc_score,
         "ml_feature_importances": win_predictor.feature_importances_,
     }
+
+    if log_audit and dispute.get("dispute_id"):
+        try:
+            log_decision(dispute["dispute_id"], result)
+        except Exception:
+            pass
+
+    return result
 
 
 def score_dataset(
@@ -255,7 +277,7 @@ def score_dataset(
     results = []
     for dispute in cases:
         try:
-            result = score_dispute(dispute, reason_codes, use_ground_truth=use_ground_truth)
+            result = score_dispute(dispute, reason_codes, use_ground_truth=use_ground_truth, log_audit=False)
             results.append(result)
         except ValueError as exc:
             results.append({"dispute_id": dispute.get("dispute_id"), "error": str(exc)})
@@ -275,10 +297,11 @@ if __name__ == "__main__":
     result = score_dispute(sample, reason_codes)
 
     print("\n=== Sample ProofPilot ML Scoring Result ===")
-    print(f"Dispute ID       : {result['dispute_id']}")
-    print(f"Readiness Score  : {result['completeness_pct']}")
-    print(f"Confidence       : {result['confidence_pct']}")
-    print(f"ML Win Prob P(Win): {result['win_probability_pct']}")
-    print(f"Expected ROI (EV): ₹{result['expected_financial_value']['expected_value_inr']}")
-    print(f"Risk Level       : {result['risk_level']}")
-    print(f"Routing Decision : {result['routing_decision']}")
+    print(f"Dispute ID           : {result['dispute_id']}")
+    print(f"Readiness Score      : {result['completeness_pct']}")
+    print(f"Confidence           : {result['confidence_pct']}")
+    print(f"ML Win Prob P(Win)   : {result['win_probability_pct']}")
+    print(f"Expected ROI (EV)    : ₹{result['expected_financial_value']['expected_value_inr']}")
+    print(f"Economic Decision    : {result['economic_recommendation']['action']} ({result['economic_recommendation']['reason']})")
+    print(f"Risk Level           : {result['risk_level']}")
+    print(f"Routing Decision     : {result['routing_decision']}")

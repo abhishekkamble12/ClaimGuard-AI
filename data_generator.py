@@ -6,7 +6,7 @@ from pathlib import Path
 
 REASON_CODES = {
     "goods_not_received": {
-        "network": "AMEX",
+        "network": "CARD",
         "reason_code": "4553",
         "title": "Goods or services not received",
         "required_evidence": {
@@ -18,7 +18,7 @@ REASON_CODES = {
         },
     },
     "product_not_as_described": {
-        "network": "AMEX",
+        "network": "CARD",
         "reason_code": "4554",
         "title": "Product or service not as described",
         "required_evidence": {
@@ -30,7 +30,7 @@ REASON_CODES = {
         },
     },
     "refund_not_processed": {
-        "network": "AMEX",
+        "network": "CARD",
         "reason_code": "4513",
         "title": "Credit not processed",
         "required_evidence": {
@@ -42,7 +42,7 @@ REASON_CODES = {
         },
     },
     "unauthorized_fraud": {
-        "network": "AMEX",
+        "network": "CARD",
         "reason_code": "4540",
         "title": "Fraud or unauthorized transaction",
         "required_evidence": {
@@ -54,7 +54,7 @@ REASON_CODES = {
         },
     },
     "duplicate_charge": {
-        "network": "AMEX",
+        "network": "CARD",
         "reason_code": "4521",
         "title": "Duplicate processing",
         "required_evidence": {
@@ -65,9 +65,45 @@ REASON_CODES = {
             "transaction_metadata": 0.10,
         },
     },
+    "upi_credit_failed": {
+        "network": "UPI",
+        "reason_code": "U001",
+        "title": "Account debited, merchant credit failed (UDIR Decline)",
+        "required_evidence": {
+            "rrn_bank_ref_log": 0.30,
+            "order_status_record": 0.25,
+            "reversal_credit_arn": 0.20,
+            "customer_communication": 0.15,
+            "transaction_metadata": 0.10,
+        },
+    },
+    "upi_autopay_goods_not_received": {
+        "network": "UPI",
+        "reason_code": "U005",
+        "title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+        "required_evidence": {
+            "mandate_registration_proof": 0.25,
+            "service_access_logs": 0.30,
+            "pre_debit_notification": 0.20,
+            "cancellation_terms": 0.15,
+            "transaction_metadata": 0.10,
+        },
+    },
+    "upi_fraudulent_collect": {
+        "network": "UPI",
+        "reason_code": "U008",
+        "title": "Fraudulent Collect Request / Unauthorized QR Scan",
+        "required_evidence": {
+            "dynamic_qr_intent_record": 0.30,
+            "device_biometric_auth_signal": 0.25,
+            "itemized_invoice": 0.20,
+            "delivery_cctv_or_otp": 0.15,
+            "transaction_metadata": 0.10,
+        },
+    },
 }
 
-MERCHANTS = ["UrbanKart India", "FitNest Wellness", "CloudKitchen Pro", "LearnLoop EdTech", "StyleForge Apparel"]
+MERCHANTS = ["UrbanKart India", "FitNest Wellness", "CloudKitchen Pro", "LearnLoop EdTech", "StyleForge Apparel", "Swiggy Bharat", "Zepto Express"]
 PAYMENT_METHODS = ["card", "upi", "wallet", "netbanking"]
 STATUSES = ["present", "weak", "missing"]
 STATUS_SCORE = {"present": 1.0, "weak": 0.5, "missing": 0.0}
@@ -84,12 +120,13 @@ def weighted_status(profile):
 def evidence_text(evidence_id, status, is_adversarial=False):
     clean_id = evidence_id.replace("_", " ").title()
     if is_adversarial and status == "weak":
-        # Adversarial text snippet that rule engines misclassify but LLMs extract correctly
         ambiguous_templates = [
             f"Courier log indicates item dropped off at building mailroom on Aug 12, but no physical customer signature collected.",
             f"Support ticket shows customer complained about color mismatch, merchant offered 10% discount but customer didn't reply.",
             f"IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
             f"Refund initiated via gateway but pending bank settlement confirmation.",
+            f"UPI 12-digit RRN generated but bank settlement batch response timed out.",
+            f"AutoPay mandate active on NPCI switch but customer disputed recurring cycle debit.",
         ]
         return random.choice(ambiguous_templates)
     
@@ -132,7 +169,7 @@ def expected_outcome(score):
 def generate_case(case_number, category, profile):
     reason = REASON_CODES[category]
     required = reason["required_evidence"]
-    is_adversarial = (case_number % 4 == 0)  # Every 4th case is an adversarial edge case
+    is_adversarial = (case_number % 4 == 0)
 
     labels = {evidence_id: weighted_status(profile) for evidence_id in required}
 
@@ -143,7 +180,7 @@ def generate_case(case_number, category, profile):
     weak = [evidence_id for evidence_id, status in labels.items() if status == "weak"]
 
     payment_date = date(2026, 8, 1) + timedelta(days=random.randint(0, 20))
-    amount_inr = random.choice([499, 999, 1499, 2499, 4999, 9999])
+    amount_inr = random.choice([499, 999, 1499, 2499, 4999, 9999, 14999])
     amount_paise = amount_inr * 100
 
     evidence_docs = {
@@ -151,6 +188,8 @@ def generate_case(case_number, category, profile):
         for evidence_id, status in labels.items()
         if status != "missing"
     }
+
+    pm = "upi" if reason["network"] == "UPI" else random.choice(PAYMENT_METHODS)
 
     dispute_id = f"disp_{1000000000000 + case_number}"
     payment_id = f"pay_{1000000000000 + random.randint(1000, 9999)}"
@@ -170,7 +209,7 @@ def generate_case(case_number, category, profile):
             "amount": amount_inr,
             "amount_paise": amount_paise,
             "currency": "INR",
-            "payment_method": random.choice(PAYMENT_METHODS),
+            "payment_method": pm,
             "payment_date": payment_date.isoformat(),
             "order_id": order_id,
             "payment_id": payment_id,
@@ -205,7 +244,7 @@ def generate_dataset(total_cases, test_ratio, seed):
 
     return {
         "dataset_name": "proofpilot_synthetic_chargeback_dataset",
-        "version": "2.1",
+        "version": "2.2",
         "total_cases": total_cases,
         "train_cases": total_cases - test_count,
         "test_cases": test_count,
@@ -226,7 +265,7 @@ def main():
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(dataset, indent=2), encoding="utf-8")
-    print(f"ProofPilot dataset generated: {dataset['total_cases']} cases (with adversarial edge cases) -> {out_path}")
+    print(f"ProofPilot dataset generated: {dataset['total_cases']} cases (AMEX & UPI coverage) -> {out_path}")
 
 
 if __name__ == "__main__":

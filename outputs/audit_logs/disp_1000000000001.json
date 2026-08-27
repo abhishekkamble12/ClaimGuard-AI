@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-08-27T18:58:49.056001+00:00",
+  "dispute_id": "disp_1000000000001",
+  "reason_code": "4553",
+  "reason_category": "goods_not_received",
+  "completeness_score": 1.0,
+  "confidence": 1.0,
+  "win_probability": 0.8676,
+  "routing_decision": "auto_draft_response",
+  "risk_level": "LOW",
+  "economic_recommendation": {
+    "action": "CONTEST",
+    "expected_gain_inr": 4270.93,
+    "fee_saved_if_accepted": 0.0,
+    "reason": "Positive EV of \u20b94,270.93 \u2014 contest recommended."
+  },
+  "expected_financial_value": {
+    "amount_inr": 4999.0,
+    "win_probability": 0.8676,
+    "dispute_fee_inr": 500.0,
+    "expected_value_inr": 4270.93,
+    "is_positive_roi": true
+  },
+  "missing_evidence": [],
+  "weak_evidence": [],
+  "evidence_elements": {
+    "order_confirmation": {
+      "status": "present",
+      "weight": 0.15,
+      "score": 1.0,
+      "weighted_contribution": 0.15,
+      "semantic_relevance": 0.1597
+    },
+    "delivery_tracking": {
+      "status": "present",
+      "weight": 0.25,
+      "score": 1.0,
+      "weighted_contribution": 0.25,
+      "semantic_relevance": 0.0666
+    },
+    "delivery_signature": {
+      "status": "present",
+      "weight": 0.3,
+      "score": 1.0,
+      "weighted_contribution": 0.3,
+      "semantic_relevance": 0.0
+    },
+    "customer_communication": {
+      "status": "present",
+      "weight": 0.15,
+      "score": 1.0,
+      "weighted_contribution": 0.15,
+      "semantic_relevance": 0.1597
+    },
+    "transaction_metadata": {
+      "status": "present",
+      "weight": 0.15,
+      "score": 1.0,
+      "weighted_contribution": 0.15,
+      "semantic_relevance": 0.1299
+    }
+  }
+}

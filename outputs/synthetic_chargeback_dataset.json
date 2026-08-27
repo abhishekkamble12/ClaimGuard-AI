@@ -1,12 +1,12 @@
 {
-  "dataset_name": "claimguard_synthetic_chargeback_dataset",
-  "version": "1.0",
-  "total_cases": 60,
-  "train_cases": 41,
-  "test_cases": 19,
+  "dataset_name": "proofpilot_synthetic_chargeback_dataset",
+  "version": "2.2",
+  "total_cases": 20,
+  "train_cases": 12,
+  "test_cases": 8,
   "reason_code_config": {
     "goods_not_received": {
-      "network": "AMEX",
+      "network": "CARD",
       "reason_code": "4553",
       "title": "Goods or services not received",
       "required_evidence": {
@@ -18,7 +18,7 @@
       }
     },
     "product_not_as_described": {
-      "network": "AMEX",
+      "network": "CARD",
       "reason_code": "4554",
       "title": "Product or service not as described",
       "required_evidence": {
@@ -30,7 +30,7 @@
       }
     },
     "refund_not_processed": {
-      "network": "AMEX",
+      "network": "CARD",
       "reason_code": "4513",
       "title": "Credit not processed",
       "required_evidence": {
@@ -42,7 +42,7 @@
       }
     },
     "unauthorized_fraud": {
-      "network": "AMEX",
+      "network": "CARD",
       "reason_code": "4540",
       "title": "Fraud or unauthorized transaction",
       "required_evidence": {
@@ -54,7 +54,7 @@
       }
     },
     "duplicate_charge": {
-      "network": "AMEX",
+      "network": "CARD",
       "reason_code": "4521",
       "title": "Duplicate processing",
       "required_evidence": {
@@ -64,481 +64,436 @@
         "customer_communication": 0.1,
         "transaction_metadata": 0.1
       }
+    },
+    "upi_credit_failed": {
+      "network": "UPI",
+      "reason_code": "U001",
+      "title": "Account debited, merchant credit failed (UDIR Decline)",
+      "required_evidence": {
+        "rrn_bank_ref_log": 0.3,
+        "order_status_record": 0.25,
+        "reversal_credit_arn": 0.2,
+        "customer_communication": 0.15,
+        "transaction_metadata": 0.1
+      }
+    },
+    "upi_autopay_goods_not_received": {
+      "network": "UPI",
+      "reason_code": "U005",
+      "title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "required_evidence": {
+        "mandate_registration_proof": 0.25,
+        "service_access_logs": 0.3,
+        "pre_debit_notification": 0.2,
+        "cancellation_terms": 0.15,
+        "transaction_metadata": 0.1
+      }
+    },
+    "upi_fraudulent_collect": {
+      "network": "UPI",
+      "reason_code": "U008",
+      "title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "required_evidence": {
+        "dynamic_qr_intent_record": 0.3,
+        "device_biometric_auth_signal": 0.25,
+        "itemized_invoice": 0.2,
+        "delivery_cctv_or_otp": 0.15,
+        "transaction_metadata": 0.1
+      }
     }
   },
   "cases": [
     {
-      "dispute_id": "DSP-0030",
-      "merchant_id": "MERCH-128",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 1499,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-18",
-        "order_id": "ORD-33405",
-        "payment_id": "pay_9519284858"
-      },
-      "evidence_documents": {
-        "settlement_record": "Settlement Record is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "missing",
-        "duplicate_transaction_comparison": "missing",
-        "settlement_record": "weak",
-        "customer_communication": "missing",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [
-        "original_transaction_id",
-        "duplicate_transaction_comparison",
-        "customer_communication"
-      ],
-      "weak_evidence": [
-        "settlement_record",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.15,
-      "expected_confidence": 0.11,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0046",
-      "merchant_id": "MERCH-418",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
+      "dispute_id": "disp_1000000000001",
+      "legacy_dispute_id": "DSP-0001",
+      "merchant_id": "acc_784129",
+      "merchant_name": "UrbanKart India",
+      "network": "CARD",
       "reason_code": "4553",
       "reason_category": "goods_not_received",
       "reason_title": "Goods or services not received",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 999,
+        "amount": 4999,
+        "amount_paise": 499900,
         "currency": "INR",
         "payment_method": "card",
-        "payment_date": "2026-08-04",
-        "order_id": "ORD-50888",
-        "payment_id": "pay_6906898409"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is available and matches the disputed transaction.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "present",
-        "delivery_tracking": "present",
-        "delivery_signature": "weak",
-        "customer_communication": "present",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "delivery_signature"
-      ],
-      "expected_completeness_score": 0.85,
-      "expected_confidence": 0.83,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0042",
-      "merchant_id": "MERCH-498",
-      "merchant_name": "CloudKitchen Pro",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-16",
-        "order_id": "ORD-31632",
-        "payment_id": "pay_8904911624"
-      },
-      "evidence_documents": {
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "product_description": "missing",
-        "customer_communication": "missing",
-        "return_policy": "missing",
-        "delivery_tracking": "weak",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [
-        "product_description",
-        "customer_communication",
-        "return_policy"
-      ],
-      "weak_evidence": [
-        "delivery_tracking",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.15,
-      "expected_confidence": 0.11,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0013",
-      "merchant_id": "MERCH-652",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 999,
-        "currency": "INR",
-        "payment_method": "wallet",
         "payment_date": "2026-08-14",
-        "order_id": "ORD-62296",
-        "payment_id": "pay_8086172302"
+        "order_id": "order_1000000004812",
+        "payment_id": "pay_1000000003194"
       },
       "evidence_documents": {
-        "refund_policy": "Refund Policy is available and matches the disputed transaction.",
-        "refund_timeline": "Refund Timeline is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "merchant_terms": "Merchant Terms is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "present",
-        "refund_timeline": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present",
-        "merchant_terms": "weak"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "merchant_terms"
-      ],
-      "expected_completeness_score": 0.925,
-      "expected_confidence": 0.905,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0053",
-      "merchant_id": "MERCH-321",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-06",
-        "order_id": "ORD-87278",
-        "payment_id": "pay_6128695961"
-      },
-      "evidence_documents": {
-        "refund_policy": "Refund Policy is available and matches the disputed transaction.",
-        "refund_timeline": "Refund Timeline is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "merchant_terms": "Merchant Terms is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "present",
-        "refund_timeline": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present",
-        "merchant_terms": "weak"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "merchant_terms"
-      ],
-      "expected_completeness_score": 0.925,
-      "expected_confidence": 0.905,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0025",
-      "merchant_id": "MERCH-749",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-02",
-        "order_id": "ORD-15778",
-        "payment_id": "pay_5310195918"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is available and matches the disputed transaction.",
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is partially available but lacks direct confirmation.",
-        "settlement_record": "Settlement Record is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "present",
-        "duplicate_transaction_comparison": "weak",
-        "settlement_record": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "duplicate_transaction_comparison",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.775,
-      "expected_confidence": 0.735,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0010",
-      "merchant_id": "MERCH-839",
-      "merchant_name": "CloudKitchen Pro",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-15",
-        "order_id": "ORD-76542",
-        "payment_id": "pay_4919706735"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is available and matches the disputed transaction.",
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is available and matches the disputed transaction.",
-        "settlement_record": "Settlement Record is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "present",
-        "duplicate_transaction_comparison": "present",
-        "settlement_record": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [],
-      "expected_completeness_score": 1.0,
-      "expected_confidence": 1.0,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0024",
-      "merchant_id": "MERCH-209",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-09",
-        "order_id": "ORD-45697",
-        "payment_id": "pay_2472659626"
-      },
-      "evidence_documents": {
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "missing",
-        "ip_device_logs": "missing",
-        "authentication_signal": "missing",
-        "transaction_metadata": "present",
-        "customer_communication": "missing"
-      },
-      "missing_evidence": [
-        "customer_history",
-        "ip_device_logs",
-        "authentication_signal",
-        "customer_communication"
-      ],
-      "weak_evidence": [],
-      "expected_completeness_score": 0.15,
-      "expected_confidence": 0.15,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0001",
-      "merchant_id": "MERCH-704",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-18",
-        "order_id": "ORD-13905",
-        "payment_id": "pay_1402418010"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is available and matches the disputed transaction.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
+        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_signature": "Official Delivery Signature uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
         "order_confirmation": "present",
         "delivery_tracking": "present",
         "delivery_signature": "present",
         "customer_communication": "present",
-        "transaction_metadata": "weak"
+        "transaction_metadata": "present"
       },
       "missing_evidence": [],
-      "weak_evidence": [
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.925,
-      "expected_confidence": 0.905,
+      "weak_evidence": [],
+      "expected_completeness_score": 1.0,
+      "expected_confidence": 1.0,
       "expected_route": "auto_draft_response",
       "expected_outcome": "won",
-      "split": "test"
+      "split": "train"
     },
     {
-      "dispute_id": "DSP-0009",
-      "merchant_id": "MERCH-641",
+      "dispute_id": "disp_1000000000002",
+      "legacy_dispute_id": "DSP-0002",
+      "merchant_id": "acc_482910",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 2499,
+        "amount_paise": 249900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-08",
+        "order_id": "order_1000000007124",
+        "payment_id": "pay_1000000005821"
+      },
+      "evidence_documents": {
+        "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "return_policy": "Official Return Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Delivery Tracking is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "product_description": "present",
+        "customer_communication": "weak",
+        "return_policy": "present",
+        "delivery_tracking": "weak",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": ["transaction_metadata"],
+      "weak_evidence": ["customer_communication", "delivery_tracking"],
+      "expected_completeness_score": 0.65,
+      "expected_confidence": 0.61,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000003",
+      "legacy_dispute_id": "DSP-0003",
+      "merchant_id": "acc_928174",
       "merchant_name": "CloudKitchen Pro",
-      "network": "AMEX",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-11",
+        "order_id": "order_1000000008431",
+        "payment_id": "pay_1000000006243"
+      },
+      "evidence_documents": {
+        "refund_policy": "Refund Policy is partially available. Document contains incomplete details.",
+        "refund_timeline": "Refund Timeline is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "weak",
+        "refund_timeline": "weak",
+        "customer_communication": "missing",
+        "transaction_metadata": "missing",
+        "merchant_terms": "missing"
+      },
+      "missing_evidence": ["customer_communication", "transaction_metadata", "merchant_terms"],
+      "weak_evidence": ["refund_policy", "refund_timeline"],
+      "expected_completeness_score": 0.25,
+      "expected_confidence": 0.21,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000004",
+      "legacy_dispute_id": "DSP-0004",
+      "merchant_id": "acc_348192",
+      "merchant_name": "LearnLoop EdTech",
+      "network": "CARD",
       "reason_code": "4540",
       "reason_category": "unauthorized_fraud",
       "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
       "transaction": {
-        "amount": 2499,
+        "amount": 9999,
+        "amount_paise": 999900,
         "currency": "INR",
         "payment_method": "card",
-        "payment_date": "2026-08-20",
-        "order_id": "ORD-99166",
-        "payment_id": "pay_4095476665"
+        "payment_date": "2026-08-15",
+        "order_id": "order_1000000001923",
+        "payment_id": "pay_1000000009412"
       },
       "evidence_documents": {
-        "customer_history": "Customer History is available and matches the disputed transaction.",
-        "ip_device_logs": "Ip Device Logs is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation."
+        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "ip_device_logs": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
+        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
         "customer_history": "present",
-        "ip_device_logs": "present",
-        "authentication_signal": "missing",
-        "transaction_metadata": "missing",
-        "customer_communication": "weak"
+        "ip_device_logs": "weak",
+        "authentication_signal": "present",
+        "transaction_metadata": "present",
+        "customer_communication": "present"
       },
-      "missing_evidence": [
-        "authentication_signal",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "customer_communication"
-      ],
+      "missing_evidence": [],
+      "weak_evidence": ["ip_device_logs"],
+      "expected_completeness_score": 0.85,
+      "expected_confidence": 0.83,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000005",
+      "legacy_dispute_id": "DSP-0005",
+      "merchant_id": "acc_519283",
+      "merchant_name": "StyleForge Apparel",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-04",
+        "order_id": "order_1000000003719",
+        "payment_id": "pay_1000000002847"
+      },
+      "evidence_documents": {
+        "original_transaction_id": "Official Original Transaction Id uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is partially available. Document contains incomplete details.",
+        "settlement_record": "Official Settlement Record uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "original_transaction_id": "present",
+        "duplicate_transaction_comparison": "weak",
+        "settlement_record": "present",
+        "customer_communication": "missing",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": ["customer_communication", "transaction_metadata"],
+      "weak_evidence": ["duplicate_transaction_comparison"],
+      "expected_completeness_score": 0.625,
+      "expected_confidence": 0.605,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000006",
+      "legacy_dispute_id": "DSP-0006",
+      "merchant_id": "acc_837194",
+      "merchant_name": "Swiggy Bharat",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-16",
+        "order_id": "order_1000000005921",
+        "payment_id": "pay_1000000004812"
+      },
+      "evidence_documents": {
+        "rrn_bank_ref_log": "Official Rrn Bank Ref Log uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "order_status_record": "Official Order Status Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "reversal_credit_arn": "Official Reversal Credit Arn uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "present",
+        "order_status_record": "present",
+        "reversal_credit_arn": "present",
+        "customer_communication": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [],
+      "expected_completeness_score": 1.0,
+      "expected_confidence": 1.0,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000007",
+      "legacy_dispute_id": "DSP-0007",
+      "merchant_id": "acc_628491",
+      "merchant_name": "Zepto Express",
+      "network": "UPI",
+      "reason_code": "U005",
+      "reason_category": "upi_autopay_goods_not_received",
+      "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-10",
+        "order_id": "order_1000000002847",
+        "payment_id": "pay_1000000007391"
+      },
+      "evidence_documents": {
+        "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "service_access_logs": "Service Access Logs is partially available. Document contains incomplete details.",
+        "pre_debit_notification": "Official Pre Debit Notification uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "mandate_registration_proof": "present",
+        "service_access_logs": "weak",
+        "pre_debit_notification": "present",
+        "cancellation_terms": "missing",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": ["cancellation_terms", "transaction_metadata"],
+      "weak_evidence": ["service_access_logs"],
+      "expected_completeness_score": 0.60,
+      "expected_confidence": 0.58,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000008",
+      "legacy_dispute_id": "DSP-0008",
+      "merchant_id": "acc_194820",
+      "merchant_name": "UrbanKart India",
+      "network": "UPI",
+      "reason_code": "U008",
+      "reason_category": "upi_fraudulent_collect",
+      "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-18",
+        "order_id": "order_1000000006249",
+        "payment_id": "pay_1000000001834"
+      },
+      "evidence_documents": {
+        "dynamic_qr_intent_record": "Official Dynamic Qr Intent Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "device_biometric_auth_signal": "UPI 12-digit RRN generated but bank settlement batch response timed out.",
+        "itemized_invoice": "Official Itemized Invoice uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_cctv_or_otp": "Official Delivery Cctv Or Otp uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "dynamic_qr_intent_record": "present",
+        "device_biometric_auth_signal": "weak",
+        "itemized_invoice": "present",
+        "delivery_cctv_or_otp": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": ["device_biometric_auth_signal"],
+      "expected_completeness_score": 0.875,
+      "expected_confidence": 0.855,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000009",
+      "legacy_dispute_id": "DSP-0009",
+      "merchant_id": "acc_738192",
+      "merchant_name": "UrbanKart India",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 4999,
+        "amount_paise": 499900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-09",
+        "order_id": "order_1000000009182",
+        "payment_id": "pay_1000000004729"
+      },
+      "evidence_documents": {
+        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "order_confirmation": "present",
+        "delivery_tracking": "present",
+        "delivery_signature": "missing",
+        "customer_communication": "present",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": ["delivery_signature", "transaction_metadata"],
+      "weak_evidence": [],
       "expected_completeness_score": 0.55,
-      "expected_confidence": 0.53,
+      "expected_confidence": 0.55,
       "expected_route": "request_more_evidence",
       "expected_outcome": "lost",
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0007",
-      "merchant_id": "MERCH-611",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
+      "dispute_id": "disp_1000000000010",
+      "legacy_dispute_id": "DSP-0010",
+      "merchant_id": "acc_294817",
+      "merchant_name": "StyleForge Apparel",
+      "network": "CARD",
       "reason_code": "4554",
       "reason_category": "product_not_as_described",
       "reason_title": "Product or service not as described",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 9999,
+        "amount": 2499,
+        "amount_paise": 249900,
         "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-07",
-        "order_id": "ORD-28726",
-        "payment_id": "pay_2137651678"
+        "payment_method": "upi",
+        "payment_date": "2026-08-12",
+        "order_id": "order_1000000004928",
+        "payment_id": "pay_1000000003819"
       },
       "evidence_documents": {
-        "product_description": "Product Description is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "return_policy": "Return Policy is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
+        "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "return_policy": "Official Return Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
         "product_description": "present",
         "customer_communication": "present",
-        "return_policy": "weak",
+        "return_policy": "present",
         "delivery_tracking": "present",
         "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "return_policy"
-      ],
-      "expected_completeness_score": 0.9,
-      "expected_confidence": 0.88,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "test"
-    },
-    {
-      "dispute_id": "DSP-0058",
-      "merchant_id": "MERCH-708",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-15",
-        "order_id": "ORD-14278",
-        "payment_id": "pay_6289150149"
-      },
-      "evidence_documents": {
-        "refund_policy": "Refund Policy is available and matches the disputed transaction.",
-        "refund_timeline": "Refund Timeline is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "merchant_terms": "Merchant Terms is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "present",
-        "refund_timeline": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present",
-        "merchant_terms": "present"
       },
       "missing_evidence": [],
       "weak_evidence": [],
@@ -549,82 +504,74 @@
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0005",
-      "merchant_id": "MERCH-786",
-      "merchant_name": "CloudKitchen Pro",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
+      "dispute_id": "disp_1000000000011",
+      "legacy_dispute_id": "DSP-0011",
+      "merchant_id": "acc_849201",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 999,
+        "amount": 1499,
+        "amount_paise": 149900,
         "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-12",
-        "order_id": "ORD-89840",
-        "payment_id": "pay_3727210979"
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-06",
+        "order_id": "order_1000000001849",
+        "payment_id": "pay_1000000007291"
       },
-      "evidence_documents": {
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is available and matches the disputed transaction.",
-        "settlement_record": "Settlement Record is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
+      "evidence_documents": {},
       "ground_truth_evidence": {
-        "original_transaction_id": "missing",
-        "duplicate_transaction_comparison": "present",
-        "settlement_record": "weak",
+        "refund_policy": "missing",
+        "refund_timeline": "missing",
         "customer_communication": "missing",
-        "transaction_metadata": "present"
+        "transaction_metadata": "missing",
+        "merchant_terms": "missing"
       },
-      "missing_evidence": [
-        "original_transaction_id",
-        "customer_communication"
-      ],
-      "weak_evidence": [
-        "settlement_record"
-      ],
-      "expected_completeness_score": 0.55,
-      "expected_confidence": 0.53,
-      "expected_route": "request_more_evidence",
+      "missing_evidence": ["refund_policy", "refund_timeline", "customer_communication", "transaction_metadata", "merchant_terms"],
+      "weak_evidence": [],
+      "expected_completeness_score": 0.0,
+      "expected_confidence": 0.0,
+      "expected_route": "human_review",
       "expected_outcome": "lost",
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0008",
-      "merchant_id": "MERCH-324",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
+      "dispute_id": "disp_1000000000012",
+      "legacy_dispute_id": "DSP-0012",
+      "merchant_id": "acc_492018",
+      "merchant_name": "LearnLoop EdTech",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
       "transaction": {
-        "amount": 1499,
+        "amount": 9999,
+        "amount_paise": 999900,
         "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-13",
-        "order_id": "ORD-21915",
-        "payment_id": "pay_4246059658"
+        "payment_method": "card",
+        "payment_date": "2026-08-17",
+        "order_id": "order_1000000008392",
+        "payment_id": "pay_1000000005721"
       },
       "evidence_documents": {
-        "refund_policy": "Refund Policy is available and matches the disputed transaction.",
-        "refund_timeline": "Refund Timeline is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
+        "customer_history": "Customer History is partially available. Document contains incomplete details.",
+        "ip_device_logs": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
+        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "refund_policy": "present",
-        "refund_timeline": "weak",
-        "customer_communication": "present",
-        "transaction_metadata": "weak",
-        "merchant_terms": "missing"
+        "customer_history": "weak",
+        "ip_device_logs": "weak",
+        "authentication_signal": "present",
+        "transaction_metadata": "present",
+        "customer_communication": "missing"
       },
-      "missing_evidence": [
-        "merchant_terms"
-      ],
-      "weak_evidence": [
-        "refund_timeline",
-        "transaction_metadata"
-      ],
+      "missing_evidence": ["customer_communication"],
+      "weak_evidence": ["customer_history", "ip_device_logs"],
       "expected_completeness_score": 0.65,
       "expected_confidence": 0.61,
       "expected_route": "request_more_evidence",
@@ -632,73 +579,73 @@
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0023",
-      "merchant_id": "MERCH-548",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
+      "dispute_id": "disp_1000000000013",
+      "legacy_dispute_id": "DSP-0013",
+      "merchant_id": "acc_391048",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 999,
+        "amount": 499,
+        "amount_paise": 49900,
         "currency": "INR",
         "payment_method": "wallet",
-        "payment_date": "2026-08-10",
-        "order_id": "ORD-90173",
-        "payment_id": "pay_3271782991"
+        "payment_date": "2026-08-03",
+        "order_id": "order_1000000002918",
+        "payment_id": "pay_1000000008472"
       },
       "evidence_documents": {
-        "refund_policy": "Refund Policy is partially available but lacks direct confirmation.",
-        "refund_timeline": "Refund Timeline is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "merchant_terms": "Merchant Terms is available and matches the disputed transaction."
+        "original_transaction_id": "Original Transaction Id is partially available. Document contains incomplete details."
       },
       "ground_truth_evidence": {
-        "refund_policy": "weak",
-        "refund_timeline": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present",
-        "merchant_terms": "present"
+        "original_transaction_id": "weak",
+        "duplicate_transaction_comparison": "missing",
+        "settlement_record": "missing",
+        "customer_communication": "missing",
+        "transaction_metadata": "missing"
       },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "refund_policy"
-      ],
-      "expected_completeness_score": 0.875,
-      "expected_confidence": 0.855,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
+      "missing_evidence": ["duplicate_transaction_comparison", "settlement_record", "customer_communication", "transaction_metadata"],
+      "weak_evidence": ["original_transaction_id"],
+      "expected_completeness_score": 0.125,
+      "expected_confidence": 0.105,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0022",
-      "merchant_id": "MERCH-569",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
+      "dispute_id": "disp_1000000000014",
+      "legacy_dispute_id": "DSP-0014",
+      "merchant_id": "acc_719482",
+      "merchant_name": "Swiggy Bharat",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 499,
+        "amount": 1499,
+        "amount_paise": 149900,
         "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-03",
-        "order_id": "ORD-19602",
-        "payment_id": "pay_3309122187"
+        "payment_method": "upi",
+        "payment_date": "2026-08-13",
+        "order_id": "order_1000000007391",
+        "payment_id": "pay_1000000006184"
       },
       "evidence_documents": {
-        "product_description": "Product Description is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "return_policy": "Return Policy is available and matches the disputed transaction.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
+        "rrn_bank_ref_log": "Official Rrn Bank Ref Log uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "order_status_record": "Official Order Status Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "reversal_credit_arn": "Official Reversal Credit Arn uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "product_description": "present",
+        "rrn_bank_ref_log": "present",
+        "order_status_record": "present",
+        "reversal_credit_arn": "present",
         "customer_communication": "present",
-        "return_policy": "present",
-        "delivery_tracking": "present",
         "transaction_metadata": "present"
       },
       "missing_evidence": [],
@@ -710,83 +657,118 @@
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0059",
-      "merchant_id": "MERCH-777",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
+      "dispute_id": "disp_1000000000015",
+      "legacy_dispute_id": "DSP-0015",
+      "merchant_id": "acc_582910",
+      "merchant_name": "Zepto Express",
+      "network": "UPI",
+      "reason_code": "U005",
+      "reason_category": "upi_autopay_goods_not_received",
+      "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 4999,
+        "amount": 2499,
+        "amount_paise": 249900,
         "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-21",
-        "order_id": "ORD-25043",
-        "payment_id": "pay_3338877621"
+        "payment_method": "upi",
+        "payment_date": "2026-08-07",
+        "order_id": "order_1000000004819",
+        "payment_id": "pay_1000000009281"
       },
       "evidence_documents": {
-        "customer_history": "Customer History is partially available but lacks direct confirmation.",
-        "ip_device_logs": "Ip Device Logs is partially available but lacks direct confirmation.",
-        "authentication_signal": "Authentication Signal is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
+        "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "service_access_logs": "Official Service Access Logs uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "pre_debit_notification": "Official Pre Debit Notification uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "cancellation_terms": "Official Cancellation Terms uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "customer_history": "weak",
-        "ip_device_logs": "weak",
-        "authentication_signal": "weak",
-        "transaction_metadata": "weak",
-        "customer_communication": "missing"
+        "mandate_registration_proof": "present",
+        "service_access_logs": "present",
+        "pre_debit_notification": "present",
+        "cancellation_terms": "present",
+        "transaction_metadata": "present"
       },
-      "missing_evidence": [
-        "customer_communication"
-      ],
-      "weak_evidence": [
-        "customer_history",
-        "ip_device_logs",
-        "authentication_signal",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.45,
-      "expected_confidence": 0.37,
+      "missing_evidence": [],
+      "weak_evidence": [],
+      "expected_completeness_score": 1.0,
+      "expected_confidence": 1.0,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000016",
+      "legacy_dispute_id": "DSP-0016",
+      "merchant_id": "acc_849102",
+      "merchant_name": "UrbanKart India",
+      "network": "UPI",
+      "reason_code": "U008",
+      "reason_category": "upi_fraudulent_collect",
+      "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 4999,
+        "amount_paise": 499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-19",
+        "order_id": "order_1000000003819",
+        "payment_id": "pay_1000000002918"
+      },
+      "evidence_documents": {
+        "dynamic_qr_intent_record": "Dynamic Qr Intent Record is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "dynamic_qr_intent_record": "weak",
+        "device_biometric_auth_signal": "missing",
+        "itemized_invoice": "missing",
+        "delivery_cctv_or_otp": "missing",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": ["device_biometric_auth_signal", "itemized_invoice", "delivery_cctv_or_otp", "transaction_metadata"],
+      "weak_evidence": ["dynamic_qr_intent_record"],
+      "expected_completeness_score": 0.15,
+      "expected_confidence": 0.13,
       "expected_route": "human_review",
       "expected_outcome": "lost",
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0034",
-      "merchant_id": "MERCH-393",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
+      "dispute_id": "disp_1000000000017",
+      "legacy_dispute_id": "DSP-0017",
+      "merchant_id": "acc_619482",
+      "merchant_name": "StyleForge Apparel",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
       "transaction": {
         "amount": 1499,
+        "amount_paise": 149900,
         "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-01",
-        "order_id": "ORD-86019",
-        "payment_id": "pay_6679017210"
+        "payment_method": "card",
+        "payment_date": "2026-08-05",
+        "order_id": "order_1000000001928",
+        "payment_id": "pay_1000000008391"
       },
       "evidence_documents": {
-        "customer_history": "Customer History is available and matches the disputed transaction.",
-        "ip_device_logs": "Ip Device Logs is partially available but lacks direct confirmation.",
-        "authentication_signal": "Authentication Signal is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction."
+        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_signature": "Delivery Signature is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "customer_history": "present",
-        "ip_device_logs": "weak",
-        "authentication_signal": "present",
-        "transaction_metadata": "present",
-        "customer_communication": "present"
+        "order_confirmation": "present",
+        "delivery_tracking": "present",
+        "delivery_signature": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "present"
       },
       "missing_evidence": [],
-      "weak_evidence": [
-        "ip_device_logs"
-      ],
+      "weak_evidence": ["delivery_signature"],
       "expected_completeness_score": 0.85,
       "expected_confidence": 0.83,
       "expected_route": "auto_draft_response",
@@ -794,570 +776,114 @@
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0004",
-      "merchant_id": "MERCH-777",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
+      "dispute_id": "disp_1000000000018",
+      "legacy_dispute_id": "DSP-0018",
+      "merchant_id": "acc_481029",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 499,
+        "amount": 2499,
+        "amount_paise": 249900,
         "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-03",
-        "order_id": "ORD-20458",
-        "payment_id": "pay_4673561638"
+        "payment_method": "upi",
+        "payment_date": "2026-08-11",
+        "order_id": "order_1000000007281",
+        "payment_id": "pay_1000000004918"
       },
       "evidence_documents": {
-        "customer_history": "Customer History is available and matches the disputed transaction.",
-        "ip_device_logs": "Ip Device Logs is available and matches the disputed transaction.",
-        "authentication_signal": "Authentication Signal is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction."
+        "product_description": "Product Description is partially available. Document contains incomplete details."
       },
       "ground_truth_evidence": {
-        "customer_history": "present",
-        "ip_device_logs": "present",
-        "authentication_signal": "weak",
-        "transaction_metadata": "present",
-        "customer_communication": "present"
+        "product_description": "weak",
+        "customer_communication": "missing",
+        "return_policy": "missing",
+        "delivery_tracking": "missing",
+        "transaction_metadata": "missing"
       },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "authentication_signal"
-      ],
-      "expected_completeness_score": 0.875,
-      "expected_confidence": 0.855,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
+      "missing_evidence": ["customer_communication", "return_policy", "delivery_tracking", "transaction_metadata"],
+      "weak_evidence": ["product_description"],
+      "expected_completeness_score": 0.125,
+      "expected_confidence": 0.105,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
       "split": "test"
     },
     {
-      "dispute_id": "DSP-0048",
-      "merchant_id": "MERCH-750",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
+      "dispute_id": "disp_1000000000019",
+      "legacy_dispute_id": "DSP-0019",
+      "merchant_id": "acc_928174",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
       "reason_code": "4513",
       "reason_category": "refund_not_processed",
       "reason_title": "Credit not processed",
+      "is_adversarial": false,
       "transaction": {
-        "amount": 1499,
+        "amount": 999,
+        "amount_paise": 99900,
         "currency": "INR",
-        "payment_method": "upi",
+        "payment_method": "card",
         "payment_date": "2026-08-14",
-        "order_id": "ORD-67080",
-        "payment_id": "pay_8088660633"
+        "order_id": "order_1000000005829",
+        "payment_id": "pay_1000000001928"
       },
       "evidence_documents": {
-        "refund_policy": "Refund Policy is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation.",
-        "merchant_terms": "Merchant Terms is partially available but lacks direct confirmation."
+        "refund_policy": "Official Refund Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "refund_timeline": "Official Refund Timeline uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
         "refund_policy": "present",
-        "refund_timeline": "missing",
-        "customer_communication": "present",
-        "transaction_metadata": "weak",
-        "merchant_terms": "weak"
+        "refund_timeline": "present",
+        "customer_communication": "weak",
+        "transaction_metadata": "present",
+        "merchant_terms": "missing"
       },
-      "missing_evidence": [
-        "refund_timeline"
-      ],
-      "weak_evidence": [
-        "transaction_metadata",
-        "merchant_terms"
-      ],
-      "expected_completeness_score": 0.6,
-      "expected_confidence": 0.56,
+      "missing_evidence": ["merchant_terms"],
+      "weak_evidence": ["customer_communication"],
+      "expected_completeness_score": 0.75,
+      "expected_confidence": 0.73,
       "expected_route": "request_more_evidence",
       "expected_outcome": "lost",
-      "split": "train"
+      "split": "test"
     },
     {
-      "dispute_id": "DSP-0011",
-      "merchant_id": "MERCH-897",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-06",
-        "order_id": "ORD-88504",
-        "payment_id": "pay_6687206971"
-      },
-      "evidence_documents": {
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "missing",
-        "delivery_tracking": "present",
-        "delivery_signature": "weak",
-        "customer_communication": "weak",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [
-        "order_confirmation"
-      ],
-      "weak_evidence": [
-        "delivery_signature",
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.625,
-      "expected_confidence": 0.585,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0055",
-      "merchant_id": "MERCH-941",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-16",
-        "order_id": "ORD-74454",
-        "payment_id": "pay_9908115095"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is available and matches the disputed transaction.",
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is available and matches the disputed transaction.",
-        "settlement_record": "Settlement Record is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "present",
-        "duplicate_transaction_comparison": "present",
-        "settlement_record": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "transaction_metadata"
-      ],
-      "weak_evidence": [],
-      "expected_completeness_score": 0.9,
-      "expected_confidence": 0.9,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0054",
-      "merchant_id": "MERCH-399",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
+      "dispute_id": "disp_1000000000020",
+      "legacy_dispute_id": "DSP-0020",
+      "merchant_id": "acc_381920",
+      "merchant_name": "LearnLoop EdTech",
+      "network": "CARD",
       "reason_code": "4540",
       "reason_category": "unauthorized_fraud",
       "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
       "transaction": {
-        "amount": 4999,
+        "amount": 9999,
+        "amount_paise": 999900,
         "currency": "INR",
         "payment_method": "netbanking",
-        "payment_date": "2026-08-02",
-        "order_id": "ORD-23446",
-        "payment_id": "pay_4748302739"
+        "payment_date": "2026-08-20",
+        "order_id": "order_1000000009184",
+        "payment_id": "pay_1000000003812"
       },
       "evidence_documents": {
-        "customer_history": "Customer History is partially available but lacks direct confirmation.",
-        "ip_device_logs": "Ip Device Logs is available and matches the disputed transaction.",
-        "authentication_signal": "Authentication Signal is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation."
+        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "ip_device_logs": "Official Ip Device Logs uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "customer_history": "weak",
+        "customer_history": "present",
         "ip_device_logs": "present",
         "authentication_signal": "present",
-        "transaction_metadata": "missing",
-        "customer_communication": "weak"
-      },
-      "missing_evidence": [
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "customer_history",
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.7,
-      "expected_confidence": 0.66,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0057",
-      "merchant_id": "MERCH-857",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-02",
-        "order_id": "ORD-91987",
-        "payment_id": "pay_6201313620"
-      },
-      "evidence_documents": {
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "product_description": "missing",
-        "customer_communication": "weak",
-        "return_policy": "missing",
-        "delivery_tracking": "weak",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "product_description",
-        "return_policy",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "customer_communication",
-        "delivery_tracking"
-      ],
-      "expected_completeness_score": 0.2,
-      "expected_confidence": 0.16,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0036",
-      "merchant_id": "MERCH-970",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-16",
-        "order_id": "ORD-64321",
-        "payment_id": "pay_3472487690"
-      },
-      "evidence_documents": {
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation.",
-        "delivery_signature": "Delivery Signature is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "missing",
-        "delivery_tracking": "weak",
-        "delivery_signature": "weak",
-        "customer_communication": "present",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [
-        "order_confirmation"
-      ],
-      "weak_evidence": [
-        "delivery_tracking",
-        "delivery_signature",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.5,
-      "expected_confidence": 0.44,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0016",
-      "merchant_id": "MERCH-155",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-15",
-        "order_id": "ORD-62772",
-        "payment_id": "pay_8422620843"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "weak",
-        "delivery_tracking": "present",
-        "delivery_signature": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "order_confirmation"
-      ],
-      "expected_completeness_score": 0.925,
-      "expected_confidence": 0.905,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0027",
-      "merchant_id": "MERCH-355",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-07",
-        "order_id": "ORD-83385",
-        "payment_id": "pay_4993808565"
-      },
-      "evidence_documents": {
-        "product_description": "Product Description is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "product_description": "weak",
-        "customer_communication": "missing",
-        "return_policy": "missing",
-        "delivery_tracking": "missing",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "customer_communication",
-        "return_policy",
-        "delivery_tracking",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "product_description"
-      ],
-      "expected_completeness_score": 0.125,
-      "expected_confidence": 0.105,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0047",
-      "merchant_id": "MERCH-714",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-10",
-        "order_id": "ORD-55508",
-        "payment_id": "pay_7583090712"
-      },
-      "evidence_documents": {
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "return_policy": "Return Policy is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "product_description": "missing",
-        "customer_communication": "present",
-        "return_policy": "weak",
-        "delivery_tracking": "missing",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [
-        "product_description",
-        "delivery_tracking"
-      ],
-      "weak_evidence": [
-        "return_policy"
-      ],
-      "expected_completeness_score": 0.5,
-      "expected_confidence": 0.48,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0014",
-      "merchant_id": "MERCH-335",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-19",
-        "order_id": "ORD-10942",
-        "payment_id": "pay_9894847574"
-      },
-      "evidence_documents": {
-        "customer_history": "Customer History is partially available but lacks direct confirmation.",
-        "ip_device_logs": "Ip Device Logs is partially available but lacks direct confirmation.",
-        "authentication_signal": "Authentication Signal is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "weak",
-        "ip_device_logs": "weak",
-        "authentication_signal": "present",
         "transaction_metadata": "present",
         "customer_communication": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "customer_history",
-        "ip_device_logs"
-      ],
-      "expected_completeness_score": 0.75,
-      "expected_confidence": 0.71,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0019",
-      "merchant_id": "MERCH-835",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-18",
-        "order_id": "ORD-34890",
-        "payment_id": "pay_2274350418"
-      },
-      "evidence_documents": {
-        "customer_history": "Customer History is available and matches the disputed transaction.",
-        "ip_device_logs": "Ip Device Logs is partially available but lacks direct confirmation.",
-        "authentication_signal": "Authentication Signal is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "present",
-        "ip_device_logs": "weak",
-        "authentication_signal": "weak",
-        "transaction_metadata": "present",
-        "customer_communication": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "ip_device_logs",
-        "authentication_signal"
-      ],
-      "expected_completeness_score": 0.725,
-      "expected_confidence": 0.685,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0043",
-      "merchant_id": "MERCH-758",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-01",
-        "order_id": "ORD-70515",
-        "payment_id": "pay_1780520225"
-      },
-      "evidence_documents": {
-        "refund_policy": "Refund Policy is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation.",
-        "merchant_terms": "Merchant Terms is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "weak",
-        "refund_timeline": "missing",
-        "customer_communication": "present",
-        "transaction_metadata": "weak",
-        "merchant_terms": "present"
-      },
-      "missing_evidence": [
-        "refund_timeline"
-      ],
-      "weak_evidence": [
-        "refund_policy",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.55,
-      "expected_confidence": 0.51,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0040",
-      "merchant_id": "MERCH-524",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-07",
-        "order_id": "ORD-81121",
-        "payment_id": "pay_7296096954"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is available and matches the disputed transaction.",
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is available and matches the disputed transaction.",
-        "settlement_record": "Settlement Record is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "present",
-        "duplicate_transaction_comparison": "present",
-        "settlement_record": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present"
       },
       "missing_evidence": [],
       "weak_evidence": [],
@@ -1365,1172 +891,7 @@
       "expected_confidence": 1.0,
       "expected_route": "auto_draft_response",
       "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0052",
-      "merchant_id": "MERCH-663",
-      "merchant_name": "CloudKitchen Pro",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-14",
-        "order_id": "ORD-69473",
-        "payment_id": "pay_6458544482"
-      },
-      "evidence_documents": {
-        "product_description": "Product Description is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "return_policy": "Return Policy is available and matches the disputed transaction.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "product_description": "present",
-        "customer_communication": "present",
-        "return_policy": "present",
-        "delivery_tracking": "present",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [],
-      "expected_completeness_score": 1.0,
-      "expected_confidence": 1.0,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0031",
-      "merchant_id": "MERCH-494",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-17",
-        "order_id": "ORD-43386",
-        "payment_id": "pay_9780573290"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is available and matches the disputed transaction.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "present",
-        "delivery_tracking": "present",
-        "delivery_signature": "present",
-        "customer_communication": "weak",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.925,
-      "expected_confidence": 0.905,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0012",
-      "merchant_id": "MERCH-187",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-19",
-        "order_id": "ORD-79822",
-        "payment_id": "pay_4289233844"
-      },
-      "evidence_documents": {
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "product_description": "missing",
-        "customer_communication": "missing",
-        "return_policy": "missing",
-        "delivery_tracking": "weak",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [
-        "product_description",
-        "customer_communication",
-        "return_policy"
-      ],
-      "weak_evidence": [
-        "delivery_tracking"
-      ],
-      "expected_completeness_score": 0.225,
-      "expected_confidence": 0.205,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0049",
-      "merchant_id": "MERCH-950",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "transaction": {
-        "amount": 999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-11",
-        "order_id": "ORD-69087",
-        "payment_id": "pay_6922713963"
-      },
-      "evidence_documents": {
-        "customer_history": "Customer History is partially available but lacks direct confirmation.",
-        "ip_device_logs": "Ip Device Logs is partially available but lacks direct confirmation.",
-        "authentication_signal": "Authentication Signal is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "weak",
-        "ip_device_logs": "weak",
-        "authentication_signal": "present",
-        "transaction_metadata": "weak",
-        "customer_communication": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "customer_history",
-        "ip_device_logs",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.675,
-      "expected_confidence": 0.615,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0041",
-      "merchant_id": "MERCH-489",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-01",
-        "order_id": "ORD-56105",
-        "payment_id": "pay_8884394611"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "present",
-        "delivery_tracking": "missing",
-        "delivery_signature": "present",
-        "customer_communication": "weak",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "delivery_tracking",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.525,
-      "expected_confidence": 0.505,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0056",
-      "merchant_id": "MERCH-671",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-08",
-        "order_id": "ORD-78494",
-        "payment_id": "pay_6928678489"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "weak",
-        "delivery_tracking": "present",
-        "delivery_signature": "present",
-        "customer_communication": "weak",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "order_confirmation",
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.85,
-      "expected_confidence": 0.81,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0044",
-      "merchant_id": "MERCH-954",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "transaction": {
-        "amount": 1499,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-14",
-        "order_id": "ORD-12540",
-        "payment_id": "pay_9383431259"
-      },
-      "evidence_documents": {
-        "customer_history": "Customer History is available and matches the disputed transaction.",
-        "ip_device_logs": "Ip Device Logs is partially available but lacks direct confirmation.",
-        "authentication_signal": "Authentication Signal is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "present",
-        "ip_device_logs": "weak",
-        "authentication_signal": "present",
-        "transaction_metadata": "missing",
-        "customer_communication": "present"
-      },
-      "missing_evidence": [
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "ip_device_logs"
-      ],
-      "expected_completeness_score": 0.7,
-      "expected_confidence": 0.68,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0038",
-      "merchant_id": "MERCH-424",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-18",
-        "order_id": "ORD-81810",
-        "payment_id": "pay_8995059760"
-      },
-      "evidence_documents": {
-        "refund_timeline": "Refund Timeline is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation.",
-        "merchant_terms": "Merchant Terms is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "missing",
-        "refund_timeline": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "weak",
-        "merchant_terms": "weak"
-      },
-      "missing_evidence": [
-        "refund_policy"
-      ],
-      "weak_evidence": [
-        "transaction_metadata",
-        "merchant_terms"
-      ],
-      "expected_completeness_score": 0.6,
-      "expected_confidence": 0.56,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0037",
-      "merchant_id": "MERCH-324",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 2499,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-04",
-        "order_id": "ORD-16582",
-        "payment_id": "pay_3394039673"
-      },
-      "evidence_documents": {
-        "product_description": "Product Description is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "return_policy": "Return Policy is available and matches the disputed transaction.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "product_description": "present",
-        "customer_communication": "present",
-        "return_policy": "present",
-        "delivery_tracking": "present",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.925,
-      "expected_confidence": 0.905,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0015",
-      "merchant_id": "MERCH-652",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 999,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-16",
-        "order_id": "ORD-41850",
-        "payment_id": "pay_8664882079"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "weak",
-        "duplicate_transaction_comparison": "missing",
-        "settlement_record": "missing",
-        "customer_communication": "present",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [
-        "duplicate_transaction_comparison",
-        "settlement_record"
-      ],
-      "weak_evidence": [
-        "original_transaction_id",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.275,
-      "expected_confidence": 0.235,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0051",
-      "merchant_id": "MERCH-911",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 2499,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-16",
-        "order_id": "ORD-48566",
-        "payment_id": "pay_6246716604"
-      },
-      "evidence_documents": {
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "missing",
-        "delivery_tracking": "weak",
-        "delivery_signature": "missing",
-        "customer_communication": "missing",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "order_confirmation",
-        "delivery_signature",
-        "customer_communication",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "delivery_tracking"
-      ],
-      "expected_completeness_score": 0.125,
-      "expected_confidence": 0.105,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0002",
-      "merchant_id": "MERCH-559",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-14",
-        "order_id": "ORD-10851",
-        "payment_id": "pay_7110082321"
-      },
-      "evidence_documents": {
-        "product_description": "Product Description is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "return_policy": "Return Policy is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "product_description": "present",
-        "customer_communication": "weak",
-        "return_policy": "weak",
-        "delivery_tracking": "weak",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "customer_communication",
-        "return_policy",
-        "delivery_tracking",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.625,
-      "expected_confidence": 0.545,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0017",
-      "merchant_id": "MERCH-573",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 1499,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-06",
-        "order_id": "ORD-68082",
-        "payment_id": "pay_1420514789"
-      },
-      "evidence_documents": {
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "return_policy": "Return Policy is available and matches the disputed transaction.",
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "product_description": "missing",
-        "customer_communication": "present",
-        "return_policy": "present",
-        "delivery_tracking": "weak",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [
-        "product_description"
-      ],
-      "weak_evidence": [
-        "delivery_tracking"
-      ],
-      "expected_completeness_score": 0.675,
-      "expected_confidence": 0.655,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0050",
-      "merchant_id": "MERCH-382",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-20",
-        "order_id": "ORD-77715",
-        "payment_id": "pay_5071897791"
-      },
-      "evidence_documents": {
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is available and matches the disputed transaction.",
-        "settlement_record": "Settlement Record is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "missing",
-        "duplicate_transaction_comparison": "present",
-        "settlement_record": "present",
-        "customer_communication": "weak",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [
-        "original_transaction_id"
-      ],
-      "weak_evidence": [
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.7,
-      "expected_confidence": 0.68,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0021",
-      "merchant_id": "MERCH-183",
-      "merchant_name": "LearnLoop",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-02",
-        "order_id": "ORD-44179",
-        "payment_id": "pay_8370987661"
-      },
-      "evidence_documents": {
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "missing",
-        "delivery_tracking": "weak",
-        "delivery_signature": "missing",
-        "customer_communication": "missing",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "order_confirmation",
-        "delivery_signature",
-        "customer_communication",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "delivery_tracking"
-      ],
-      "expected_completeness_score": 0.125,
-      "expected_confidence": 0.105,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0028",
-      "merchant_id": "MERCH-921",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 2499,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-11",
-        "order_id": "ORD-30866",
-        "payment_id": "pay_5759234471"
-      },
-      "evidence_documents": {
-        "refund_policy": "Refund Policy is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation.",
-        "merchant_terms": "Merchant Terms is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "weak",
-        "refund_timeline": "missing",
-        "customer_communication": "weak",
-        "transaction_metadata": "weak",
-        "merchant_terms": "present"
-      },
-      "missing_evidence": [
-        "refund_timeline"
-      ],
-      "weak_evidence": [
-        "refund_policy",
-        "customer_communication",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.45,
-      "expected_confidence": 0.39,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0003",
-      "merchant_id": "MERCH-370",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-12",
-        "order_id": "ORD-80284",
-        "payment_id": "pay_9256195745"
-      },
-      "evidence_documents": {
-        "refund_policy": "Refund Policy is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation.",
-        "merchant_terms": "Merchant Terms is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "weak",
-        "refund_timeline": "missing",
-        "customer_communication": "present",
-        "transaction_metadata": "weak",
-        "merchant_terms": "weak"
-      },
-      "missing_evidence": [
-        "refund_timeline"
-      ],
-      "weak_evidence": [
-        "refund_policy",
-        "transaction_metadata",
-        "merchant_terms"
-      ],
-      "expected_completeness_score": 0.475,
-      "expected_confidence": 0.415,
-      "expected_route": "human_review",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0039",
-      "merchant_id": "MERCH-550",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "transaction": {
-        "amount": 1499,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-08",
-        "order_id": "ORD-40735",
-        "payment_id": "pay_6461974809"
-      },
-      "evidence_documents": {
-        "authentication_signal": "Authentication Signal is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "missing",
-        "ip_device_logs": "missing",
-        "authentication_signal": "weak",
-        "transaction_metadata": "missing",
-        "customer_communication": "weak"
-      },
-      "missing_evidence": [
-        "customer_history",
-        "ip_device_logs",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "authentication_signal",
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.175,
-      "expected_confidence": 0.135,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0006",
-      "merchant_id": "MERCH-432",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-08",
-        "order_id": "ORD-14207",
-        "payment_id": "pay_8752612686"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation.",
-        "delivery_signature": "Delivery Signature is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "weak",
-        "delivery_tracking": "weak",
-        "delivery_signature": "weak",
-        "customer_communication": "missing",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "customer_communication",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "order_confirmation",
-        "delivery_tracking",
-        "delivery_signature"
-      ],
-      "expected_completeness_score": 0.35,
-      "expected_confidence": 0.29,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0029",
-      "merchant_id": "MERCH-328",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "transaction": {
-        "amount": 999,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-10",
-        "order_id": "ORD-62227",
-        "payment_id": "pay_6704841644"
-      },
-      "evidence_documents": {
-        "authentication_signal": "Authentication Signal is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "missing",
-        "ip_device_logs": "missing",
-        "authentication_signal": "present",
-        "transaction_metadata": "missing",
-        "customer_communication": "weak"
-      },
-      "missing_evidence": [
-        "customer_history",
-        "ip_device_logs",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.3,
-      "expected_confidence": 0.28,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0032",
-      "merchant_id": "MERCH-541",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "transaction": {
-        "amount": 1499,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-07",
-        "order_id": "ORD-91678",
-        "payment_id": "pay_4642197907"
-      },
-      "evidence_documents": {
-        "product_description": "Product Description is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "product_description": "weak",
-        "customer_communication": "weak",
-        "return_policy": "missing",
-        "delivery_tracking": "weak",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "return_policy",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "product_description",
-        "customer_communication",
-        "delivery_tracking"
-      ],
-      "expected_completeness_score": 0.325,
-      "expected_confidence": 0.265,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0035",
-      "merchant_id": "MERCH-186",
-      "merchant_name": "CloudKitchen Pro",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 9999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-06",
-        "order_id": "ORD-22240",
-        "payment_id": "pay_4226113732"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is partially available but lacks direct confirmation.",
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is partially available but lacks direct confirmation.",
-        "settlement_record": "Settlement Record is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "weak",
-        "duplicate_transaction_comparison": "weak",
-        "settlement_record": "weak",
-        "customer_communication": "weak",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": [
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "original_transaction_id",
-        "duplicate_transaction_comparison",
-        "settlement_record",
-        "customer_communication"
-      ],
-      "expected_completeness_score": 0.45,
-      "expected_confidence": 0.37,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0033",
-      "merchant_id": "MERCH-230",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-10",
-        "order_id": "ORD-97153",
-        "payment_id": "pay_9333798503"
-      },
-      "evidence_documents": {
-        "refund_timeline": "Refund Timeline is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation.",
-        "merchant_terms": "Merchant Terms is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "missing",
-        "refund_timeline": "weak",
-        "customer_communication": "weak",
-        "transaction_metadata": "weak",
-        "merchant_terms": "weak"
-      },
-      "missing_evidence": [
-        "refund_policy"
-      ],
-      "weak_evidence": [
-        "refund_timeline",
-        "customer_communication",
-        "transaction_metadata",
-        "merchant_terms"
-      ],
-      "expected_completeness_score": 0.375,
-      "expected_confidence": 0.295,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0018",
-      "merchant_id": "MERCH-592",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "transaction": {
-        "amount": 2499,
-        "currency": "INR",
-        "payment_method": "netbanking",
-        "payment_date": "2026-08-14",
-        "order_id": "ORD-17685",
-        "payment_id": "pay_6002078344"
-      },
-      "evidence_documents": {
-        "refund_timeline": "Refund Timeline is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "merchant_terms": "Merchant Terms is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "missing",
-        "refund_timeline": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "missing",
-        "merchant_terms": "weak"
-      },
-      "missing_evidence": [
-        "refund_policy",
-        "transaction_metadata"
-      ],
-      "weak_evidence": [
-        "merchant_terms"
-      ],
-      "expected_completeness_score": 0.525,
-      "expected_confidence": 0.505,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0026",
-      "merchant_id": "MERCH-177",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "transaction": {
-        "amount": 499,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-01",
-        "order_id": "ORD-58393",
-        "payment_id": "pay_5931025271"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Order Confirmation is partially available but lacks direct confirmation.",
-        "delivery_tracking": "Delivery Tracking is available and matches the disputed transaction.",
-        "delivery_signature": "Delivery Signature is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is partially available but lacks direct confirmation.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "weak",
-        "delivery_tracking": "present",
-        "delivery_signature": "weak",
-        "customer_communication": "weak",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "order_confirmation",
-        "delivery_signature",
-        "customer_communication",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.625,
-      "expected_confidence": 0.545,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0060",
-      "merchant_id": "MERCH-866",
-      "merchant_name": "StyleForge",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-10",
-        "order_id": "ORD-67560",
-        "payment_id": "pay_5829062179"
-      },
-      "evidence_documents": {
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is available and matches the disputed transaction."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "missing",
-        "duplicate_transaction_comparison": "missing",
-        "settlement_record": "missing",
-        "customer_communication": "present",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [
-        "original_transaction_id",
-        "duplicate_transaction_comparison",
-        "settlement_record"
-      ],
-      "weak_evidence": [],
-      "expected_completeness_score": 0.2,
-      "expected_confidence": 0.2,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0020",
-      "merchant_id": "MERCH-261",
-      "merchant_name": "UrbanKart",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-17",
-        "order_id": "ORD-34356",
-        "payment_id": "pay_9884231465"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is partially available but lacks direct confirmation.",
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is partially available but lacks direct confirmation.",
-        "settlement_record": "Settlement Record is partially available but lacks direct confirmation.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "weak",
-        "duplicate_transaction_comparison": "weak",
-        "settlement_record": "weak",
-        "customer_communication": "present",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [
-        "original_transaction_id",
-        "duplicate_transaction_comparison",
-        "settlement_record",
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.55,
-      "expected_confidence": 0.47,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "DSP-0045",
-      "merchant_id": "MERCH-256",
-      "merchant_name": "FitNest",
-      "network": "AMEX",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "transaction": {
-        "amount": 4999,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-01",
-        "order_id": "ORD-72070",
-        "payment_id": "pay_3875303857"
-      },
-      "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is available and matches the disputed transaction.",
-        "settlement_record": "Settlement Record is available and matches the disputed transaction.",
-        "customer_communication": "Customer Communication is available and matches the disputed transaction.",
-        "transaction_metadata": "Transaction Metadata is partially available but lacks direct confirmation."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "present",
-        "duplicate_transaction_comparison": "missing",
-        "settlement_record": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "weak"
-      },
-      "missing_evidence": [
-        "duplicate_transaction_comparison"
-      ],
-      "weak_evidence": [
-        "transaction_metadata"
-      ],
-      "expected_completeness_score": 0.6,
-      "expected_confidence": 0.58,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
+      "split": "test"
     }
   ]
 }

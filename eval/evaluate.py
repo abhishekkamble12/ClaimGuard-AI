@@ -2,7 +2,8 @@
 ProofPilot — Evaluation Harness
 ---------------------------------
 Evaluates ProofPilot's risk routing, evidence detection precision/recall,
-abstention rate, and false-positive auto-draft rate on held-out benchmark splits.
+abstention rate, false-positive auto-draft rate, and false-positive financial cost (₹)
+on held-out benchmark splits. Exports results to outputs/metrics.json.
 """
 
 import json
@@ -18,7 +19,10 @@ if str(ROOT) not in sys.path:
 from scoring.scorer import score_dataset
 
 DATASET_PATH = ROOT / "outputs" / "synthetic_chargeback_dataset.json"
-CONFIG_PATH = ROOT / "config" / "reason_codes" / "amex.json"
+CONFIG_PATH = ROOT / "config" / "reason_codes"
+METRICS_PATH = ROOT / "outputs" / "metrics.json"
+
+DISPUTE_FEE_INR = 500.0  # Non-refundable fee per lost chargeback in India
 
 
 def _is_detected(status: str) -> bool:
@@ -29,14 +33,15 @@ def evaluate_dataset(
     dataset_path: str | Path = DATASET_PATH,
     config_path: str | Path = CONFIG_PATH,
     split: str | None = None,
+    save_metrics: bool = True,
 ) -> dict[str, Any]:
     dataset_path = Path(dataset_path)
     dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
     cases = dataset["cases"]
-    if split:
+    if split and split != "all":
         cases = [case for case in cases if case.get("split") == split]
 
-    results = score_dataset(dataset_path, config_path, split=split)
+    results = score_dataset(dataset_path, config_path, split=split if split != "all" else None)
     by_id = {result["dispute_id"]: result for result in results if "error" not in result}
 
     route_matches = 0
@@ -47,7 +52,9 @@ def evaluate_dataset(
     outcomes: Counter[str] = Counter()
 
     for case in cases:
-        result = by_id[case["dispute_id"]]
+        result = by_id.get(case["dispute_id"])
+        if not result:
+            continue
         predicted_route = result["routing_decision"]
         expected_route = case["expected_route"]
 
@@ -80,7 +87,14 @@ def evaluate_dataset(
     precision = evidence_tp / (evidence_tp + evidence_fp) if evidence_tp + evidence_fp else 0
     recall = evidence_tp / (evidence_tp + evidence_fn) if evidence_tp + evidence_fn else 0
 
-    return {
+    # Financial False-Positive Cost Calculation (Track 02 Rubric Requirement)
+    avg_disputed_amount = (
+        sum(float(c.get("transaction", {}).get("amount", 0)) for c in cases) / max(total_cases, 1)
+    )
+    fp_cost_per_case = avg_disputed_amount + DISPUTE_FEE_INR
+    total_fp_financial_cost = false_positive_auto_drafts * fp_cost_per_case
+
+    metrics = {
         "dataset": str(dataset_path),
         "split": split or "all",
         "total_cases": total_cases,
@@ -89,6 +103,8 @@ def evaluate_dataset(
         "evidence_detection_recall": round(recall, 4),
         "false_positive_auto_drafts": false_positive_auto_drafts,
         "false_positive_auto_draft_rate": round(false_positive_auto_drafts / auto_drafts, 4) if auto_drafts else 0,
+        "false_positive_cost_per_case_inr": round(fp_cost_per_case, 2),
+        "total_false_positive_financial_cost_inr": round(total_fp_financial_cost, 2),
         "abstention_rate": round(predicted_routes["human_review"] / total_cases, 4) if total_cases else 0,
         "predicted_routes": dict(predicted_routes),
         "expected_routes": dict(expected_routes),
@@ -100,6 +116,15 @@ def evaluate_dataset(
             "true_negative": evidence_tn,
         },
     }
+
+    if save_metrics:
+        try:
+            METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)
+            METRICS_PATH.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+        except Exception:
+            pass
+
+    return metrics
 
 
 def print_report(metrics: dict[str, Any]) -> None:
@@ -115,6 +140,8 @@ def print_report(metrics: dict[str, Any]) -> None:
         f"False-Positive Auto-Drafts: {metrics['false_positive_auto_drafts']} "
         f"({metrics['false_positive_auto_draft_rate']:.0%})"
     )
+    print(f"FP Cost (₹/case)        : ₹{metrics['false_positive_cost_per_case_inr']:,.2f}")
+    print(f"Total FP Financial Loss : ₹{metrics['total_false_positive_financial_cost_inr']:,.2f}")
     print(f"Predicted Route Dist.   : {metrics['predicted_routes']}")
 
 

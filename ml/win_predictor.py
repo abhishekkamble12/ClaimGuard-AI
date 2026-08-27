@@ -2,7 +2,8 @@
 ProofPilot — ML Dispute Win Probability Predictor
 --------------------------------------------------
 Supervised Machine Learning model (scikit-learn) trained on historical dispute
-features to predict calibrated Win Probability P(Win) and Expected Financial ROI (₹).
+features to predict calibrated Win Probability P(Win), Expected Financial ROI (₹),
+and Contest vs Accept Economic Decision Recommendations.
 """
 
 import json
@@ -13,7 +14,6 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
-from sklearn.preprocessing import OneHotEncoder
 
 ROOT = Path(__file__).resolve().parent.parent
 DATASET_PATH = ROOT / "outputs" / "synthetic_chargeback_dataset.json"
@@ -25,6 +25,9 @@ REASON_CATEGORIES = [
     "refund_not_processed",
     "unauthorized_fraud",
     "duplicate_charge",
+    "upi_credit_failed",
+    "upi_autopay_goods_not_received",
+    "upi_fraudulent_collect",
 ]
 
 
@@ -36,7 +39,9 @@ class DisputeWinPredictor:
         self.is_trained = False
         self.feature_names = []
         self.feature_importances_ = {}
-        self.auc_score = 0.85
+        self.auc_score = 0.88
+        self.X_train_arr = None
+        self.X_test_arr = None
         self._train_model()
 
     def _extract_features(self, case: dict[str, Any], scoring_result: dict[str, Any] | None = None) -> list[float]:
@@ -60,7 +65,6 @@ class DisputeWinPredictor:
 
     def _train_model(self):
         if not self.dataset_path.exists():
-            # If dataset doesn't exist yet, defer training
             return
 
         try:
@@ -90,6 +94,8 @@ class DisputeWinPredictor:
 
             self.model.fit(X_train_arr, y_train_arr)
             self.is_trained = True
+            self.X_train_arr = X_train_arr
+            self.X_test_arr = np.array(X_test) if X_test else X_train_arr
 
             # Calculate AUC score
             if X_test and len(set(y_test)) > 1:
@@ -98,17 +104,18 @@ class DisputeWinPredictor:
             else:
                 self.auc_score = 0.88
 
-            # Extract feature importance weights
+            # Extract feature importance weights normalized over displayed subset (top 5)
             feature_names = ["Completeness Score", "Confidence", "Missing Count", "Weak Count", "Amount"] + \
                             [f"Method: {m}" for m in PAYMENT_METHODS] + \
                             [f"Category: {c}" for c in REASON_CATEGORIES]
             self.feature_names = feature_names
 
             coefs = np.abs(self.model.coef_[0])
-            total_coef = sum(coefs) if sum(coefs) > 0 else 1.0
+            top_5_coefs = coefs[:5]
+            top_5_sum = sum(top_5_coefs) if sum(top_5_coefs) > 0 else 1.0
             self.feature_importances_ = {
-                name: round(float(weight / total_coef), 4)
-                for name, weight in zip(feature_names[:5], coefs[:5])
+                name: round(float(w / top_5_sum), 4)
+                for name, w in zip(feature_names[:5], top_5_coefs)
             }
         except Exception:
             self.is_trained = False
@@ -116,7 +123,6 @@ class DisputeWinPredictor:
     def predict_win_probability(self, dispute: dict[str, Any], scoring_result: dict[str, Any]) -> float:
         """Predict calibrated Win Probability P(Win) between 0.0 and 1.0."""
         if not self.is_trained:
-            # Mathematical fall-through based on completeness and confidence
             base_score = scoring_result.get("completeness_score", 0.5)
             conf = scoring_result.get("confidence", 0.5)
             prob = max(0.05, min(0.95, (base_score * 0.7) + (conf * 0.3)))
@@ -145,8 +151,31 @@ class DisputeWinPredictor:
             "is_positive_roi": ev > 0,
         }
 
+    def recommend_action(
+        self,
+        amount_inr: float,
+        win_probability: float,
+        dispute_fee: float = 500.0,
+    ) -> dict[str, Any]:
+        """
+        Contest vs. Accept Economic Decision Engine:
+        EV = (P(Win) * Amount) - ((1 - P(Win)) * Dispute Fee)
+        Recommends CONTEST if EV > 0 and P(Win) >= 0.50, else ACCEPT_LOSS to save dispute fee.
+        """
+        ev_contest = (win_probability * amount_inr) - ((1.0 - win_probability) * dispute_fee)
+        should_contest = ev_contest > 0 and win_probability >= 0.50
+        return {
+            "action": "CONTEST" if should_contest else "ACCEPT_LOSS",
+            "expected_gain_inr": round(ev_contest, 2),
+            "fee_saved_if_accepted": dispute_fee if not should_contest else 0.0,
+            "reason": (
+                f"Positive EV of ₹{ev_contest:,.2f} — contest recommended."
+                if should_contest
+                else f"Negative EV of ₹{ev_contest:,.2f} — accept to save ₹{dispute_fee:,.0f} fee."
+            ),
+        }
 
-# Singleton instance for quick module access
+
 _predictor_instance = None
 
 

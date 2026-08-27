@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-08-27T18:48:10.740938+00:00",
+  "dispute_id": "DSP-0030",
+  "reason_code": "4521",
+  "reason_category": "duplicate_charge",
+  "completeness_score": 0.15,
+  "confidence": 0.11,
+  "win_probability": 0.0361,
+  "routing_decision": "human_review",
+  "risk_level": "HIGH",
+  "economic_recommendation": {
+    "action": "ACCEPT_LOSS",
+    "expected_gain_inr": -427.84,
+    "fee_saved_if_accepted": 500.0,
+    "reason": "Negative EV of \u20b9-427.84 \u2014 accept to save \u20b9500 fee."
+  },
+  "expected_financial_value": {
+    "amount_inr": 1499.0,
+    "win_probability": 0.0361,
+    "dispute_fee_inr": 500.0,
+    "expected_value_inr": -427.84,
+    "is_positive_roi": false
+  },
+  "missing_evidence": [
+    "duplicate_transaction_comparison",
+    "original_transaction_id",
+    "customer_communication"
+  ],
+  "weak_evidence": [
+    "settlement_record",
+    "transaction_metadata"
+  ],
+  "evidence_elements": {
+    "original_transaction_id": {
+      "status": "missing",
+      "weight": 0.25,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "duplicate_transaction_comparison": {
+      "status": "missing",
+      "weight": 0.35,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "settlement_record": {
+      "status": "weak",
+      "weight": 0.2,
+      "score": 0.5,
+      "weighted_contribution": 0.1,
+      "semantic_relevance": 0.1844
+    },
+    "customer_communication": {
+      "status": "missing",
+      "weight": 0.1,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "transaction_metadata": {
+      "status": "weak",
+      "weight": 0.1,
+      "score": 0.5,
+      "weighted_contribution": 0.05,
+      "semantic_relevance": 0.2379
+    }
+  }
+}

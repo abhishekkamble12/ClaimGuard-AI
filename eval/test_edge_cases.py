@@ -8,7 +8,7 @@ from scoring.scorer import infer_evidence_statuses, load_reason_code_config, sco
 
 ROOT = Path(__file__).resolve().parent.parent
 DATASET_PATH = ROOT / "outputs" / "synthetic_chargeback_dataset.json"
-CONFIG_PATH = ROOT / "config" / "reason_codes" / "amex.json"
+CONFIG_PATH = ROOT / "config" / "reason_codes"
 
 
 def first_case_and_config():

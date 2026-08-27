@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-08-27T18:59:50.488226+00:00",
+  "dispute_id": "disp_1000000000003",
+  "reason_code": "4513",
+  "reason_category": "refund_not_processed",
+  "completeness_score": 0.45,
+  "confidence": 0.41,
+  "win_probability": 0.108,
+  "routing_decision": "human_review",
+  "risk_level": "HIGH",
+  "economic_recommendation": {
+    "action": "ACCEPT_LOSS",
+    "expected_gain_inr": -338.11,
+    "fee_saved_if_accepted": 500.0,
+    "reason": "Negative EV of \u20b9-338.11 \u2014 accept to save \u20b9500 fee."
+  },
+  "expected_financial_value": {
+    "amount_inr": 999.0,
+    "win_probability": 0.108,
+    "dispute_fee_inr": 500.0,
+    "expected_value_inr": -338.11,
+    "is_positive_roi": false
+  },
+  "missing_evidence": [
+    "transaction_metadata",
+    "merchant_terms"
+  ],
+  "weak_evidence": [
+    "refund_policy",
+    "refund_timeline"
+  ],
+  "evidence_elements": {
+    "refund_policy": {
+      "status": "weak",
+      "weight": 0.25,
+      "score": 0.5,
+      "weighted_contribution": 0.125,
+      "semantic_relevance": 0.1708
+    },
+    "refund_timeline": {
+      "status": "weak",
+      "weight": 0.25,
+      "score": 0.5,
+      "weighted_contribution": 0.125,
+      "semantic_relevance": 0.0787
+    },
+    "customer_communication": {
+      "status": "present",
+      "weight": 0.2,
+      "score": 1.0,
+      "weighted_contribution": 0.2,
+      "semantic_relevance": 0.0736
+    },
+    "transaction_metadata": {
+      "status": "missing",
+      "weight": 0.15,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "merchant_terms": {
+      "status": "missing",
+      "weight": 0.15,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    }
+  }
+}

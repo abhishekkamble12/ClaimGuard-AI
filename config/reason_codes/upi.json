@@ -1,0 +1,117 @@
+{
+  "network": "UPI",
+  "version": "1.0",
+  "reason_codes": {
+    "upi_credit_failed": {
+      "reason_code": "U001",
+      "title": "Account debited, merchant credit failed (UDIR Decline)",
+      "description": "Customer account was debited on NPCI UPI switch but merchant credit failed or transaction timed out.",
+      "required_evidence": {
+        "rrn_bank_ref_log": {
+          "weight": 0.30,
+          "description": "12-digit UPI Retrieval Reference Number (RRN) and bank settlement audit response.",
+          "examples": ["NPCI Switch RRN Log", "Payer PSP Response Code", "UDIR Dispute Record"]
+        },
+        "order_status_record": {
+          "weight": 0.25,
+          "description": "Merchant order database state confirming payment failure or product non-dispatch.",
+          "examples": ["Order Lifecycle Log", "Backend Cart State", "Merchant Callback Audit"]
+        },
+        "reversal_credit_arn": {
+          "weight": 0.20,
+          "description": "Automated T+1 bank reversal confirmation showing funds released back to remitter bank.",
+          "examples": ["NPCI Reversal Reference", "Remitter Bank Credit Proof", "Razorpay Reversal Log"]
+        },
+        "customer_communication": {
+          "weight": 0.15,
+          "description": "Automated SMS / email notifying payer of decline and bank refund timeframe.",
+          "examples": ["In-app Notification", "SMS Delivery Receipt", "Ticket Transcript"]
+        },
+        "transaction_metadata": {
+          "weight": 0.10,
+          "description": "UPI VPA handles (@upi, @okaxis, @okhdfcbank), Transaction ID, and timestamp.",
+          "examples": ["Razorpay Payment Receipt", "VPA String", "Timestamp Log"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    },
+    "upi_autopay_goods_not_received": {
+      "reason_code": "U005",
+      "title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "description": "Customer disputes recurring mandate debit claiming subscription benefit was not provisioned.",
+      "required_evidence": {
+        "mandate_registration_proof": {
+          "weight": 0.25,
+          "description": "Signed UPI AutoPay e-mandate registration with NPCI mandate UMN reference.",
+          "examples": ["NPCI Mandate UMN Record", "Customer e-Mandate Consent Log", "Debit Notification SMS Proof"]
+        },
+        "service_access_logs": {
+          "weight": 0.30,
+          "description": "Platform digital service login and content access telemetry during subscription cycle.",
+          "examples": ["User Session Telemetry", "IP Activity Log", "Content Download Receipt"]
+        },
+        "pre_debit_notification": {
+          "weight": 0.20,
+          "description": "Proof of 24-hour mandatory pre-debit SMS/email notification dispatched per RBI guidelines.",
+          "examples": ["Pre-debit SMS Log", "Email Dispatch Timestamp", "PSP Webhook Response"]
+        },
+        "cancellation_terms": {
+          "weight": 0.15,
+          "description": "Merchant recurring billing policy and active cancellation terms shown during onboarding.",
+          "examples": ["Terms & Conditions", "Subscription Agreement", "Cancellation Policy Page"]
+        },
+        "transaction_metadata": {
+          "weight": 0.10,
+          "description": "Recurring mandate execution sequence number, payment ID, and cycle date.",
+          "examples": ["Execution Invoice", "Payment Gateway Receipt", "Cycle Reference"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    },
+    "upi_fraudulent_collect": {
+      "reason_code": "U008",
+      "title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "description": "Customer claims collect request or dynamic merchant QR payment was deceptive or unauthorized.",
+      "required_evidence": {
+        "dynamic_qr_intent_record": {
+          "weight": 0.30,
+          "description": "Dynamic QR payload logs including merchant POS terminal ID, Geo-tag, and verified intent.",
+          "examples": ["Dynamic QR Generation Log", "POS Terminal Audit Trail", "Store Geo-Location Tag"]
+        },
+        "device_biometric_auth_signal": {
+          "weight": 0.25,
+          "description": "2FA UPI PIN verification and device telemetry confirming MPIN entry at payer PSP.",
+          "examples": ["MPIN Success Signal", "PSP Device Binding Confirmation", "SIM Telemetry Signal"]
+        },
+        "itemized_invoice": {
+          "weight": 0.20,
+          "description": "GST-compliant itemized merchant invoice matching QR charge amount exactly.",
+          "examples": ["GST Tax Invoice", "POS Print Receipt", "E-Bill Transcript"]
+        },
+        "delivery_cctv_or_otp": {
+          "weight": 0.15,
+          "description": "In-person physical delivery confirmation, OTP redemption, or store CCTV log.",
+          "examples": ["Store Pickup OTP Log", "Signed Delivery Slip", "Store CCTV Timestamp Proof"]
+        },
+        "transaction_metadata": {
+          "weight": 0.10,
+          "description": "Transaction reference, payer VPA, and NPCI transaction ID.",
+          "examples": ["Razorpay Payment ID", "NPCI Txn Reference", "Payer VPA"]
+        }
+      },
+      "routing_thresholds": {
+        "auto_draft_response": { "min_score": 0.80, "min_confidence": 0.75 },
+        "request_more_evidence": { "min_score": 0.50 },
+        "human_review": { "max_score": 0.49 }
+      }
+    }
+  }
+}
