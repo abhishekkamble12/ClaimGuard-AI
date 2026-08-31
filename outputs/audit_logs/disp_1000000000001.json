@@ -1,63 +1,69 @@
 {
-  "timestamp": "2026-08-27T18:58:49.056001+00:00",
+  "timestamp": "2026-08-28T14:09:08.937120+00:00",
   "dispute_id": "disp_1000000000001",
   "reason_code": "4553",
   "reason_category": "goods_not_received",
-  "completeness_score": 1.0,
-  "confidence": 1.0,
-  "win_probability": 0.8676,
-  "routing_decision": "auto_draft_response",
-  "risk_level": "LOW",
+  "completeness_score": 0.0,
+  "confidence": 0.0,
+  "win_probability": 0.0199,
+  "routing_decision": "human_review",
+  "risk_level": "HIGH",
   "economic_recommendation": {
-    "action": "CONTEST",
-    "expected_gain_inr": 4270.93,
-    "fee_saved_if_accepted": 0.0,
-    "reason": "Positive EV of \u20b94,270.93 \u2014 contest recommended."
+    "action": "ACCEPT_LOSS",
+    "expected_gain_inr": -390.57,
+    "fee_saved_if_accepted": 500.0,
+    "reason": "Negative EV of \u20b9-390.57 \u2014 accept to save \u20b9500 fee."
   },
   "expected_financial_value": {
     "amount_inr": 4999.0,
-    "win_probability": 0.8676,
+    "win_probability": 0.0199,
     "dispute_fee_inr": 500.0,
-    "expected_value_inr": 4270.93,
-    "is_positive_roi": true
+    "expected_value_inr": -390.57,
+    "is_positive_roi": false
   },
-  "missing_evidence": [],
+  "missing_evidence": [
+    "delivery_signature",
+    "delivery_tracking",
+    "order_confirmation",
+    "customer_communication",
+    "transaction_metadata"
+  ],
   "weak_evidence": [],
   "evidence_elements": {
     "order_confirmation": {
-      "status": "present",
+      "status": "missing",
       "weight": 0.15,
-      "score": 1.0,
-      "weighted_contribution": 0.15,
-      "semantic_relevance": 0.1597
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
     },
     "delivery_tracking": {
-      "status": "present",
+      "status": "missing",
       "weight": 0.25,
-      "score": 1.0,
-      "weighted_contribution": 0.25,
-      "semantic_relevance": 0.0666
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
     },
     "delivery_signature": {
-      "status": "present",
+      "status": "missing",
       "weight": 0.3,
-      "score": 1.0,
-      "weighted_contribution": 0.3,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
       "semantic_relevance": 0.0
     },
     "customer_communication": {
-      "status": "present",
+      "status": "missing",
       "weight": 0.15,
-      "score": 1.0,
-      "weighted_contribution": 0.15,
-      "semantic_relevance": 0.1597
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
     },
     "transaction_metadata": {
-      "status": "present",
+      "status": "missing",
       "weight": 0.15,
-      "score": 1.0,
-      "weighted_contribution": 0.15,
-      "semantic_relevance": 0.1299
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
     }
   }
 }

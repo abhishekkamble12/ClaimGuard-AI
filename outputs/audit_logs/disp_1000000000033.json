@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-08-28T15:45:18.304692+00:00",
+  "dispute_id": "disp_1000000000033",
+  "reason_code": "4553",
+  "reason_category": "goods_not_received",
+  "completeness_score": 0.15,
+  "confidence": 0.11,
+  "win_probability": 0.0416,
+  "routing_decision": "human_review",
+  "risk_level": "HIGH",
+  "economic_recommendation": {
+    "action": "ACCEPT_LOSS",
+    "expected_gain_inr": -63.24,
+    "fee_saved_if_accepted": 500.0,
+    "reason": "Negative EV of \u20b9-63.24 \u2014 accept to save \u20b9500 fee."
+  },
+  "expected_financial_value": {
+    "amount_inr": 9999.0,
+    "win_probability": 0.0416,
+    "dispute_fee_inr": 500.0,
+    "expected_value_inr": -63.24,
+    "is_positive_roi": false
+  },
+  "missing_evidence": [
+    "delivery_signature",
+    "delivery_tracking",
+    "transaction_metadata"
+  ],
+  "weak_evidence": [
+    "order_confirmation",
+    "customer_communication"
+  ],
+  "evidence_elements": {
+    "order_confirmation": {
+      "status": "weak",
+      "weight": 0.15,
+      "score": 0.5,
+      "weighted_contribution": 0.075,
+      "semantic_relevance": 0.087
+    },
+    "delivery_tracking": {
+      "status": "missing",
+      "weight": 0.25,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "delivery_signature": {
+      "status": "missing",
+      "weight": 0.3,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "customer_communication": {
+      "status": "weak",
+      "weight": 0.15,
+      "score": 0.5,
+      "weighted_contribution": 0.075,
+      "semantic_relevance": 0.1909
+    },
+    "transaction_metadata": {
+      "status": "missing",
+      "weight": 0.15,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    }
+  }
+}

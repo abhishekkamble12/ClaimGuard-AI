@@ -1,0 +1,37 @@
+{
+  "dataset_size": 60,
+  "train_count": 41,
+  "test_count": 19,
+  "models": {
+    "lr": {
+      "roc_auc": 0.7976,
+      "brier_score": 0.1756,
+      "precision": 0.625,
+      "recall": 0.7143
+    },
+    "gbt": {
+      "roc_auc": 0.8095,
+      "brier_score": 0.1987,
+      "precision": 0.5714,
+      "recall": 0.5714
+    },
+    "rf": {
+      "roc_auc": 0.8095,
+      "brier_score": 0.1574,
+      "precision": 0.75,
+      "recall": 0.4286
+    },
+    "stacked_ensemble": {
+      "roc_auc": 0.8214,
+      "brier_score": 0.1556,
+      "precision": 0.6667,
+      "recall": 0.5714,
+      "weights": {
+        "gbt": 0.5,
+        "lr": 0.3,
+        "rf": 0.2
+      }
+    }
+  },
+  "active_model": "stacked_ensemble"
+}

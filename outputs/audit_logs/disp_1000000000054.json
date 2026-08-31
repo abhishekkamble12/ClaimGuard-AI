@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-08-28T15:45:01.262795+00:00",
+  "dispute_id": "disp_1000000000054",
+  "reason_code": "U001",
+  "reason_category": "upi_credit_failed",
+  "completeness_score": 0.1,
+  "confidence": 0.08,
+  "win_probability": 0.0225,
+  "routing_decision": "human_review",
+  "risk_level": "HIGH",
+  "economic_recommendation": {
+    "action": "ACCEPT_LOSS",
+    "expected_gain_inr": -432.52,
+    "fee_saved_if_accepted": 500.0,
+    "reason": "Negative EV of \u20b9-432.52 \u2014 accept to save \u20b9500 fee."
+  },
+  "expected_financial_value": {
+    "amount_inr": 2499.0,
+    "win_probability": 0.0225,
+    "dispute_fee_inr": 500.0,
+    "expected_value_inr": -432.52,
+    "is_positive_roi": false
+  },
+  "missing_evidence": [
+    "rrn_bank_ref_log",
+    "order_status_record",
+    "customer_communication",
+    "transaction_metadata"
+  ],
+  "weak_evidence": [
+    "reversal_credit_arn"
+  ],
+  "evidence_elements": {
+    "rrn_bank_ref_log": {
+      "status": "missing",
+      "weight": 0.3,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "order_status_record": {
+      "status": "missing",
+      "weight": 0.25,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "reversal_credit_arn": {
+      "status": "weak",
+      "weight": 0.2,
+      "score": 0.5,
+      "weighted_contribution": 0.1,
+      "semantic_relevance": 0.0536
+    },
+    "customer_communication": {
+      "status": "missing",
+      "weight": 0.15,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "transaction_metadata": {
+      "status": "missing",
+      "weight": 0.1,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    }
+  }
+}

@@ -1,33 +1,33 @@
 {
   "dataset": "D:\\ClaimGuard-AI\\outputs\\synthetic_chargeback_dataset.json",
   "split": "test",
-  "total_cases": 12,
-  "route_accuracy": 0.6667,
+  "total_cases": 19,
+  "route_accuracy": 0.8947,
   "evidence_detection_precision": 1.0,
   "evidence_detection_recall": 1.0,
   "false_positive_auto_drafts": 1,
-  "false_positive_auto_draft_rate": 0.25,
-  "false_positive_cost_per_case_inr": 4124.0,
-  "total_false_positive_financial_cost_inr": 4124.0,
-  "abstention_rate": 0.25,
+  "false_positive_auto_draft_rate": 0.1667,
+  "false_positive_cost_per_case_inr": 4735.84,
+  "total_false_positive_financial_cost_inr": 4735.84,
+  "abstention_rate": 0.2632,
   "predicted_routes": {
-    "request_more_evidence": 2,
-    "auto_draft_response": 4,
-    "human_review": 3
+    "auto_draft_response": 6,
+    "request_more_evidence": 8,
+    "human_review": 5
   },
   "expected_routes": {
-    "request_more_evidence": 3,
-    "auto_draft_response": 3,
-    "human_review": 3
+    "request_more_evidence": 8,
+    "human_review": 6,
+    "auto_draft_response": 5
   },
   "expected_outcomes": {
-    "lost": 6,
-    "won": 3
+    "won": 7,
+    "lost": 12
   },
   "evidence_confusion": {
-    "true_positive": 28,
+    "true_positive": 71,
     "false_positive": 0,
     "false_negative": 0,
-    "true_negative": 17
+    "true_negative": 24
   }
 }

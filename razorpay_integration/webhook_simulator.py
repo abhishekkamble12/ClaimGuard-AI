@@ -9,9 +9,10 @@ cryptographic HMAC-SHA256 signatures for payment gateway security compliance.
 import hashlib
 import hmac
 import json
+import os
 from typing import Any
 
-DEFAULT_WEBHOOK_SECRET = "rzp_test_secret_proofpilot_2026"
+DEFAULT_WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "rzp_test_secret_proofpilot_2026")
 
 
 def sign_webhook_payload(payload: dict[str, Any], secret: str = DEFAULT_WEBHOOK_SECRET) -> str:

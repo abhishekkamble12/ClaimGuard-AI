@@ -1,0 +1,21 @@
+# ProofPilot — Core Scoring & Risk Gate Thresholds
+# Modifying this configuration dynamically updates business rules without code changes.
+
+routing_gates:
+  auto_draft_min_score: 0.80
+  auto_draft_min_confidence: 0.75
+  request_more_min_score: 0.50
+
+evidence_status_weights:
+  present: 1.0
+  weak: 0.5
+  missing: 0.0
+
+economic_defaults:
+  dispute_fee_inr: 500.0
+  min_contest_win_probability: 0.50
+
+risk_tiers:
+  low_risk_min_score: 0.80
+  low_risk_min_confidence: 0.75
+  medium_risk_min_score: 0.50

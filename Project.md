@@ -92,7 +92,7 @@ ClaimGuard-AI / ProofPilot
 │   └── reason_codes/
 │       ├── amex.json              # Amex chargeback reason-code weights & thresholds
 │       └── upi.json               # NPCI UPI dispute reason-code config
-├── eval/
+├── evaluation/
 │   ├── evaluate.py                # Benchmark evaluation harness with ₹ FP cost
 │   ├── test_edge_cases.py         # Adversarial edge case tests
 │   └── test_scorer.py             # Scorer, ML, security & economics unit tests

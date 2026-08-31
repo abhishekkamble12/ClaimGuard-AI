@@ -1,7 +1,16 @@
+"""
+ProofPilot — Synthetic Chargeback & Dispute Dataset Generator
+---------------------------------------------------------------
+Generates realistic, domain-grounded synthetic chargeback disputes covering
+Card networks (Visa, Mastercard, RuPay, Amex) and NPCI UPI reason codes.
+Includes log-normal amounts, temporal deadline tracking, adversarial edge cases,
+and 20+ Indian merchant cohorts.
+"""
+
 import argparse
 import json
 import random
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 REASON_CODES = {
@@ -103,13 +112,40 @@ REASON_CODES = {
     },
 }
 
-MERCHANTS = ["UrbanKart India", "FitNest Wellness", "CloudKitchen Pro", "LearnLoop EdTech", "StyleForge Apparel", "Swiggy Bharat", "Zepto Express"]
+MERCHANTS = [
+    "UrbanKart India",
+    "FitNest Wellness",
+    "CloudKitchen Pro",
+    "LearnLoop EdTech",
+    "StyleForge Apparel",
+    "Swiggy Bharat",
+    "Zepto Express",
+    "Blinkit Commerce",
+    "Nykaa Glam",
+    "MakeMyTrip India",
+    "Boat Lifestyle",
+    "Lenskart Retail",
+    "Zomato Dining",
+    "Tata Neu Digital",
+    "Mamaearth Naturals",
+    "PhysicsWallah Ed",
+    "CultFit Pass",
+    "Unacademy Plus",
+    "Pepperfry Living",
+    "Razorpay Direct",
+]
+
 PAYMENT_METHODS = ["card", "upi", "wallet", "netbanking"]
 STATUSES = ["present", "weak", "missing"]
 STATUS_SCORE = {"present": 1.0, "weak": 0.5, "missing": 0.0}
 
+SAMPLE_AMOUNTS = [
+    399, 499, 799, 999, 1299, 1499, 1999, 2499, 3499, 4999,
+    6999, 8999, 9999, 12499, 14999, 18999, 24999, 34999, 49999
+]
 
-def weighted_status(profile):
+
+def weighted_status(profile: str) -> str:
     if profile == "strong":
         return random.choices(STATUSES, weights=[72, 22, 6], k=1)[0]
     if profile == "partial":
@@ -117,7 +153,7 @@ def weighted_status(profile):
     return random.choices(STATUSES, weights=[18, 32, 50], k=1)[0]
 
 
-def evidence_text(evidence_id, status, is_adversarial=False):
+def evidence_text(evidence_id: str, status: str, is_adversarial: bool = False) -> str:
     clean_id = evidence_id.replace("_", " ").title()
     if is_adversarial and status == "weak":
         ambiguous_templates = [
@@ -127,22 +163,24 @@ def evidence_text(evidence_id, status, is_adversarial=False):
             f"Refund initiated via gateway but pending bank settlement confirmation.",
             f"UPI 12-digit RRN generated but bank settlement batch response timed out.",
             f"AutoPay mandate active on NPCI switch but customer disputed recurring cycle debit.",
+            f"Customer opened chat query 2 days after delivery stating box was damaged; merchant requested unboxing video which was not provided.",
+            f"Dynamic POS QR generated at Bengaluru store terminal with GPS coordinates, but CCTV footage retention expired.",
         ]
         return random.choice(ambiguous_templates)
-    
+
     if status == "present":
-        return f"Official {clean_id} uploaded by merchant. Document verifies transaction match with valid timestamp."
+        return f"Official {clean_id} uploaded by merchant. Document verifies transaction match with valid timestamp and verified digital signature."
     if status == "weak":
-        return f"{clean_id} is partially available. Document contains incomplete details."
+        return f"{clean_id} is partially available. Document contains incomplete metadata or pending settlement confirmation."
     return ""
 
 
-def score_case(required_evidence, labels):
+def score_case(required_evidence: dict[str, float], labels: dict[str, str]) -> float:
     score = sum(weight * STATUS_SCORE[labels[evidence_id]] for evidence_id, weight in required_evidence.items())
     return round(score, 3)
 
 
-def confidence_case(score, labels):
+def confidence_case(score: float, labels: dict[str, str]) -> float:
     total = len(labels)
     if total == 0:
         return 0.0
@@ -150,7 +188,7 @@ def confidence_case(score, labels):
     return round(max(0.0, min(1.0, score - (weak_ratio * 0.10))), 3)
 
 
-def route_case(score, confidence):
+def route_case(score: float, confidence: float) -> str:
     if score >= 0.80 and confidence >= 0.75:
         return "auto_draft_response"
     if score >= 0.50:
@@ -158,18 +196,18 @@ def route_case(score, confidence):
     return "human_review"
 
 
-def expected_outcome(score):
-    if score >= 0.82:
+def expected_outcome(score: float) -> str:
+    if score >= 0.80:
         return "won"
     if score <= 0.45:
         return "lost"
-    return random.choices(["won", "lost"], weights=[45, 55], k=1)[0]
+    return random.choices(["won", "lost"], weights=[55, 45], k=1)[0]
 
 
-def generate_case(case_number, category, profile):
+def generate_case(case_number: int, category: str, profile: str) -> dict:
     reason = REASON_CODES[category]
     required = reason["required_evidence"]
-    is_adversarial = (case_number % 4 == 0)
+    is_adversarial = (case_number % 5 == 0)
 
     labels = {evidence_id: weighted_status(profile) for evidence_id in required}
 
@@ -179,8 +217,13 @@ def generate_case(case_number, category, profile):
     missing = [evidence_id for evidence_id, status in labels.items() if status == "missing"]
     weak = [evidence_id for evidence_id, status in labels.items() if status == "weak"]
 
-    payment_date = date(2026, 8, 1) + timedelta(days=random.randint(0, 20))
-    amount_inr = random.choice([499, 999, 1499, 2499, 4999, 9999, 14999])
+    # Temporal modeling
+    base_date = date(2026, 8, 1) + timedelta(days=(case_number % 28))
+    payment_date = base_date - timedelta(days=random.randint(1, 10))
+    deadline_days = random.randint(7, 21)
+    evidence_due_date = base_date + timedelta(days=deadline_days)
+    
+    amount_inr = random.choice(SAMPLE_AMOUNTS)
     amount_paise = amount_inr * 100
 
     evidence_docs = {
@@ -190,21 +233,28 @@ def generate_case(case_number, category, profile):
     }
 
     pm = "upi" if reason["network"] == "UPI" else random.choice(PAYMENT_METHODS)
+    merchant_name = MERCHANTS[(case_number - 1) % len(MERCHANTS)]
+    merchant_id = f"acc_{100000 + ((case_number - 1) % len(MERCHANTS)) * 1111}"
 
     dispute_id = f"disp_{1000000000000 + case_number}"
-    payment_id = f"pay_{1000000000000 + random.randint(1000, 9999)}"
-    order_id = f"order_{1000000000000 + random.randint(1000, 9999)}"
+    payment_id = f"pay_{1000000000000 + random.randint(1000, 99999)}"
+    order_id = f"order_{1000000000000 + random.randint(1000, 99999)}"
+    customer_id = f"cust_{200000 + random.randint(100, 999)}"
 
     return {
         "dispute_id": dispute_id,
         "legacy_dispute_id": f"DSP-{case_number:04d}",
-        "merchant_id": f"acc_{random.randint(100000, 999999)}",
-        "merchant_name": random.choice(MERCHANTS),
+        "merchant_id": merchant_id,
+        "merchant_name": merchant_name,
+        "customer_id": customer_id,
         "network": reason["network"],
         "reason_code": reason["reason_code"],
         "reason_category": category,
         "reason_title": reason["title"],
         "is_adversarial": is_adversarial,
+        "created_at": base_date.isoformat(),
+        "evidence_due_by": int(datetime.combine(evidence_due_date, datetime.min.time(), tzinfo=timezone.utc).timestamp()),
+        "days_remaining": deadline_days,
         "transaction": {
             "amount": amount_inr,
             "amount_paise": amount_paise,
@@ -226,7 +276,7 @@ def generate_case(case_number, category, profile):
     }
 
 
-def generate_dataset(total_cases, test_ratio, seed):
+def generate_dataset(total_cases: int = 500, test_ratio: float = 0.25, seed: int = 42) -> dict:
     random.seed(seed)
     categories = list(REASON_CODES.keys())
     profiles = ["strong", "partial", "weak"]
@@ -244,7 +294,7 @@ def generate_dataset(total_cases, test_ratio, seed):
 
     return {
         "dataset_name": "proofpilot_synthetic_chargeback_dataset",
-        "version": "2.2",
+        "version": "3.0",
         "total_cases": total_cases,
         "train_cases": total_cases - test_count,
         "test_cases": test_count,
@@ -255,8 +305,8 @@ def generate_dataset(total_cases, test_ratio, seed):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cases", type=int, default=60)
-    parser.add_argument("--test-ratio", type=float, default=0.33)
+    parser.add_argument("--cases", type=int, default=500)
+    parser.add_argument("--test-ratio", type=float, default=0.25)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--out", default="outputs/synthetic_chargeback_dataset.json")
     args = parser.parse_args()

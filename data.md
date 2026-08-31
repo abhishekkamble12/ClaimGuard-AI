@@ -105,5 +105,5 @@ Do not claim this is real chargeback data. In the pitch, say:
 That is honest, credible, and aligned with the Buildathon requirement for measured precision and recall.
 
 For a stronger evaluation claim, treat the manually designed tests in
-`eval/test_edge_cases.py` as behavioral safeguards, not benchmark training
+`evaluation/test_edge_cases.py` as behavioral safeguards, not benchmark training
 data. They cover missing, weak, misleading, empty, and unknown-reason inputs.

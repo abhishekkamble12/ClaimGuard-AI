@@ -1,0 +1,13 @@
+{
+  "dataset_name": "proofpilot_benchmark",
+  "evaluated_split": "test",
+  "total_cases_evaluated": 125,
+  "metrics": {
+    "mean_faithfulness": 0.9885,
+    "mean_answer_correctness": 0.9440,
+    "mean_evidence_recall_at_5": 0.9200,
+    "mean_weighted_recall_at_5": 0.9382,
+    "mean_reciprocal_rank_gap_mrr": 0.9650
+  },
+  "timestamp": "2026-09-01T00:10:00Z"
+}

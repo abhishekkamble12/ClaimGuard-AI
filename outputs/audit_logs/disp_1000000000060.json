@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-08-31T18:50:48.812072+00:00",
+  "dispute_id": "disp_1000000000060",
+  "reason_code": "4540",
+  "reason_category": "unauthorized_fraud",
+  "completeness_score": 0.0,
+  "confidence": 0.0,
+  "win_probability": 0.0164,
+  "routing_decision": "human_review",
+  "risk_level": "HIGH",
+  "economic_recommendation": {
+    "action": "ACCEPT_LOSS",
+    "expected_gain_inr": -467.22,
+    "fee_saved_if_accepted": 500.0,
+    "reason": "Negative EV of \u20b9-467.22 \u2014 accept to save \u20b9500 fee."
+  },
+  "expected_financial_value": {
+    "amount_inr": 1499.0,
+    "win_probability": 0.0164,
+    "dispute_fee_inr": 500.0,
+    "expected_value_inr": -467.22,
+    "is_positive_roi": false
+  },
+  "missing_evidence": [
+    "ip_device_logs",
+    "authentication_signal",
+    "customer_history",
+    "transaction_metadata",
+    "customer_communication"
+  ],
+  "weak_evidence": [],
+  "evidence_elements": {
+    "customer_history": {
+      "status": "missing",
+      "weight": 0.2,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "ip_device_logs": {
+      "status": "missing",
+      "weight": 0.3,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "authentication_signal": {
+      "status": "missing",
+      "weight": 0.25,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "transaction_metadata": {
+      "status": "missing",
+      "weight": 0.15,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    },
+    "customer_communication": {
+      "status": "missing",
+      "weight": 0.1,
+      "score": 0.0,
+      "weighted_contribution": 0.0,
+      "semantic_relevance": 0.0
+    }
+  }
+}

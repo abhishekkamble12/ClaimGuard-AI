@@ -1,9 +1,9 @@
 {
   "dataset_name": "proofpilot_synthetic_chargeback_dataset",
   "version": "2.2",
-  "total_cases": 20,
-  "train_cases": 12,
-  "test_cases": 8,
+  "total_cases": 60,
+  "train_cases": 41,
+  "test_cases": 19,
   "reason_code_config": {
     "goods_not_received": {
       "network": "CARD",
@@ -104,250 +104,369 @@
   },
   "cases": [
     {
-      "dispute_id": "disp_1000000000001",
-      "legacy_dispute_id": "DSP-0001",
-      "merchant_id": "acc_784129",
-      "merchant_name": "UrbanKart India",
-      "network": "CARD",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
-      "is_adversarial": false,
-      "transaction": {
-        "amount": 4999,
-        "amount_paise": 499900,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-14",
-        "order_id": "order_1000000004812",
-        "payment_id": "pay_1000000003194"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "delivery_signature": "Official Delivery Signature uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "present",
-        "delivery_tracking": "present",
-        "delivery_signature": "present",
-        "customer_communication": "present",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": [],
-      "expected_completeness_score": 1.0,
-      "expected_confidence": 1.0,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "disp_1000000000002",
-      "legacy_dispute_id": "DSP-0002",
-      "merchant_id": "acc_482910",
-      "merchant_name": "FitNest Wellness",
-      "network": "CARD",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "is_adversarial": false,
-      "transaction": {
-        "amount": 2499,
-        "amount_paise": 249900,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-08",
-        "order_id": "order_1000000007124",
-        "payment_id": "pay_1000000005821"
-      },
-      "evidence_documents": {
-        "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
-        "return_policy": "Official Return Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "delivery_tracking": "Delivery Tracking is partially available. Document contains incomplete details."
-      },
-      "ground_truth_evidence": {
-        "product_description": "present",
-        "customer_communication": "weak",
-        "return_policy": "present",
-        "delivery_tracking": "weak",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": ["transaction_metadata"],
-      "weak_evidence": ["customer_communication", "delivery_tracking"],
-      "expected_completeness_score": 0.65,
-      "expected_confidence": 0.61,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "disp_1000000000003",
-      "legacy_dispute_id": "DSP-0003",
-      "merchant_id": "acc_928174",
-      "merchant_name": "CloudKitchen Pro",
-      "network": "CARD",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
-      "is_adversarial": false,
-      "transaction": {
-        "amount": 999,
-        "amount_paise": 99900,
-        "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-11",
-        "order_id": "order_1000000008431",
-        "payment_id": "pay_1000000006243"
-      },
-      "evidence_documents": {
-        "refund_policy": "Refund Policy is partially available. Document contains incomplete details.",
-        "refund_timeline": "Refund Timeline is partially available. Document contains incomplete details."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "weak",
-        "refund_timeline": "weak",
-        "customer_communication": "missing",
-        "transaction_metadata": "missing",
-        "merchant_terms": "missing"
-      },
-      "missing_evidence": ["customer_communication", "transaction_metadata", "merchant_terms"],
-      "weak_evidence": ["refund_policy", "refund_timeline"],
-      "expected_completeness_score": 0.25,
-      "expected_confidence": 0.21,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "train"
-    },
-    {
-      "dispute_id": "disp_1000000000004",
-      "legacy_dispute_id": "DSP-0004",
-      "merchant_id": "acc_348192",
-      "merchant_name": "LearnLoop EdTech",
+      "dispute_id": "disp_1000000000060",
+      "legacy_dispute_id": "DSP-0060",
+      "merchant_id": "acc_157174",
+      "merchant_name": "StyleForge Apparel",
       "network": "CARD",
       "reason_code": "4540",
       "reason_category": "unauthorized_fraud",
       "reason_title": "Fraud or unauthorized transaction",
       "is_adversarial": true,
       "transaction": {
-        "amount": 9999,
-        "amount_paise": 999900,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-15",
-        "order_id": "order_1000000001923",
-        "payment_id": "pay_1000000009412"
-      },
-      "evidence_documents": {
-        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "ip_device_logs": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
-        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
-      },
-      "ground_truth_evidence": {
-        "customer_history": "present",
-        "ip_device_logs": "weak",
-        "authentication_signal": "present",
-        "transaction_metadata": "present",
-        "customer_communication": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": ["ip_device_logs"],
-      "expected_completeness_score": 0.85,
-      "expected_confidence": 0.83,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
-    },
-    {
-      "dispute_id": "disp_1000000000005",
-      "legacy_dispute_id": "DSP-0005",
-      "merchant_id": "acc_519283",
-      "merchant_name": "StyleForge Apparel",
-      "network": "CARD",
-      "reason_code": "4521",
-      "reason_category": "duplicate_charge",
-      "reason_title": "Duplicate processing",
-      "is_adversarial": false,
-      "transaction": {
         "amount": 1499,
         "amount_paise": 149900,
         "currency": "INR",
         "payment_method": "upi",
-        "payment_date": "2026-08-04",
-        "order_id": "order_1000000003719",
-        "payment_id": "pay_1000000002847"
+        "payment_date": "2026-08-06",
+        "order_id": "order_1000000001745",
+        "payment_id": "pay_1000000005494"
       },
       "evidence_documents": {
-        "original_transaction_id": "Official Original Transaction Id uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is partially available. Document contains incomplete details.",
-        "settlement_record": "Official Settlement Record uploaded by merchant. Document verifies transaction match with valid timestamp."
+        "ip_device_logs": "Courier log indicates item dropped off at building mailroom on Aug 12, but no physical customer signature collected.",
+        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "AutoPay mandate active on NPCI switch but customer disputed recurring cycle debit.",
+        "customer_communication": "UPI 12-digit RRN generated but bank settlement batch response timed out."
       },
       "ground_truth_evidence": {
-        "original_transaction_id": "present",
-        "duplicate_transaction_comparison": "weak",
-        "settlement_record": "present",
-        "customer_communication": "missing",
-        "transaction_metadata": "missing"
+        "customer_history": "missing",
+        "ip_device_logs": "weak",
+        "authentication_signal": "present",
+        "transaction_metadata": "weak",
+        "customer_communication": "weak"
       },
-      "missing_evidence": ["customer_communication", "transaction_metadata"],
-      "weak_evidence": ["duplicate_transaction_comparison"],
-      "expected_completeness_score": 0.625,
-      "expected_confidence": 0.605,
+      "missing_evidence": [
+        "customer_history"
+      ],
+      "weak_evidence": [
+        "ip_device_logs",
+        "transaction_metadata",
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.525,
+      "expected_confidence": 0.465,
       "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "train"
+      "expected_outcome": "won",
+      "split": "test"
     },
     {
-      "dispute_id": "disp_1000000000006",
-      "legacy_dispute_id": "DSP-0006",
-      "merchant_id": "acc_837194",
-      "merchant_name": "Swiggy Bharat",
+      "dispute_id": "disp_1000000000003",
+      "legacy_dispute_id": "DSP-0003",
+      "merchant_id": "acc_946335",
+      "merchant_name": "UrbanKart India",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-13",
+        "order_id": "order_1000000005333",
+        "payment_id": "pay_1000000006635"
+      },
+      "evidence_documents": {
+        "refund_policy": "Refund Policy is partially available. Document contains incomplete details.",
+        "refund_timeline": "Refund Timeline is partially available. Document contains incomplete details.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "merchant_terms": "Official Merchant Terms uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "weak",
+        "refund_timeline": "weak",
+        "customer_communication": "weak",
+        "transaction_metadata": "missing",
+        "merchant_terms": "present"
+      },
+      "missing_evidence": [
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "refund_policy",
+        "refund_timeline",
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.5,
+      "expected_confidence": 0.44,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000057",
+      "legacy_dispute_id": "DSP-0057",
+      "merchant_id": "acc_825391",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-01",
+        "order_id": "order_1000000007625",
+        "payment_id": "pay_1000000004630"
+      },
+      "evidence_documents": {
+        "order_confirmation": "Order Confirmation is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "order_confirmation": "weak",
+        "delivery_tracking": "missing",
+        "delivery_signature": "missing",
+        "customer_communication": "missing",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "delivery_tracking",
+        "delivery_signature",
+        "customer_communication"
+      ],
+      "weak_evidence": [
+        "order_confirmation",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.15,
+      "expected_confidence": 0.11,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000054",
+      "legacy_dispute_id": "DSP-0054",
+      "merchant_id": "acc_437960",
+      "merchant_name": "Zepto Express",
       "network": "UPI",
       "reason_code": "U001",
       "reason_category": "upi_credit_failed",
       "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
       "is_adversarial": false,
       "transaction": {
-        "amount": 499,
-        "amount_paise": 49900,
+        "amount": 2499,
+        "amount_paise": 249900,
         "currency": "INR",
         "payment_method": "upi",
         "payment_date": "2026-08-16",
-        "order_id": "order_1000000005921",
-        "payment_id": "pay_1000000004812"
+        "order_id": "order_1000000005397",
+        "payment_id": "pay_1000000008136"
       },
       "evidence_documents": {
-        "rrn_bank_ref_log": "Official Rrn Bank Ref Log uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "order_status_record": "Official Order Status Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "reversal_credit_arn": "Official Reversal Credit Arn uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "reversal_credit_arn": "Reversal Credit Arn is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "missing",
+        "order_status_record": "missing",
+        "reversal_credit_arn": "weak",
+        "customer_communication": "missing",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": [
+        "rrn_bank_ref_log",
+        "order_status_record",
+        "customer_communication",
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "reversal_credit_arn"
+      ],
+      "expected_completeness_score": 0.1,
+      "expected_confidence": 0.08,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000033",
+      "legacy_dispute_id": "DSP-0033",
+      "merchant_id": "acc_373903",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 9999,
+        "amount_paise": 999900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-13",
+        "order_id": "order_1000000002889",
+        "payment_id": "pay_1000000001452"
+      },
+      "evidence_documents": {
+        "order_confirmation": "Order Confirmation is partially available. Document contains incomplete details.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "order_confirmation": "weak",
+        "delivery_tracking": "missing",
+        "delivery_signature": "missing",
+        "customer_communication": "weak",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": [
+        "delivery_tracking",
+        "delivery_signature",
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "order_confirmation",
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.15,
+      "expected_confidence": 0.11,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000055",
+      "legacy_dispute_id": "DSP-0055",
+      "merchant_id": "acc_130094",
+      "merchant_name": "LearnLoop EdTech",
+      "network": "UPI",
+      "reason_code": "U005",
+      "reason_category": "upi_autopay_goods_not_received",
+      "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 4999,
+        "amount_paise": 499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-19",
+        "order_id": "order_1000000006511",
+        "payment_id": "pay_1000000007209"
+      },
+      "evidence_documents": {
+        "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "service_access_logs": "Service Access Logs is partially available. Document contains incomplete details.",
+        "pre_debit_notification": "Official Pre Debit Notification uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "cancellation_terms": "Official Cancellation Terms uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "mandate_registration_proof": "present",
+        "service_access_logs": "weak",
+        "pre_debit_notification": "present",
+        "cancellation_terms": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "service_access_logs",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.8,
+      "expected_confidence": 0.76,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000024",
+      "legacy_dispute_id": "DSP-0024",
+      "merchant_id": "acc_579434",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "UPI",
+      "reason_code": "U008",
+      "reason_category": "upi_fraudulent_collect",
+      "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-11",
+        "order_id": "order_1000000005915",
+        "payment_id": "pay_1000000003144"
+      },
+      "evidence_documents": {
+        "dynamic_qr_intent_record": "Official Dynamic Qr Intent Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_cctv_or_otp": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
+        "transaction_metadata": "Refund initiated via gateway but pending bank settlement confirmation."
+      },
+      "ground_truth_evidence": {
+        "dynamic_qr_intent_record": "present",
+        "device_biometric_auth_signal": "missing",
+        "itemized_invoice": "missing",
+        "delivery_cctv_or_otp": "weak",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "device_biometric_auth_signal",
+        "itemized_invoice"
+      ],
+      "weak_evidence": [
+        "delivery_cctv_or_otp",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.425,
+      "expected_confidence": 0.385,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000048",
+      "legacy_dispute_id": "DSP-0048",
+      "merchant_id": "acc_453894",
+      "merchant_name": "Zepto Express",
+      "network": "UPI",
+      "reason_code": "U008",
+      "reason_category": "upi_fraudulent_collect",
+      "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-13",
+        "order_id": "order_1000000006355",
+        "payment_id": "pay_1000000008449"
+      },
+      "evidence_documents": {
+        "dynamic_qr_intent_record": "Official Dynamic Qr Intent Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "itemized_invoice": "Official Itemized Invoice uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_cctv_or_otp": "Support ticket shows customer complained about color mismatch, merchant offered 10% discount but customer didn't reply.",
         "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "rrn_bank_ref_log": "present",
-        "order_status_record": "present",
-        "reversal_credit_arn": "present",
-        "customer_communication": "present",
+        "dynamic_qr_intent_record": "present",
+        "device_biometric_auth_signal": "missing",
+        "itemized_invoice": "present",
+        "delivery_cctv_or_otp": "weak",
         "transaction_metadata": "present"
       },
-      "missing_evidence": [],
-      "weak_evidence": [],
-      "expected_completeness_score": 1.0,
-      "expected_confidence": 1.0,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "train"
+      "missing_evidence": [
+        "device_biometric_auth_signal"
+      ],
+      "weak_evidence": [
+        "delivery_cctv_or_otp"
+      ],
+      "expected_completeness_score": 0.675,
+      "expected_confidence": 0.655,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "test"
     },
     {
-      "dispute_id": "disp_1000000000007",
-      "legacy_dispute_id": "DSP-0007",
-      "merchant_id": "acc_628491",
-      "merchant_name": "Zepto Express",
+      "dispute_id": "disp_1000000000039",
+      "legacy_dispute_id": "DSP-0039",
+      "merchant_id": "acc_577538",
+      "merchant_name": "LearnLoop EdTech",
       "network": "UPI",
       "reason_code": "U005",
       "reason_category": "upi_autopay_goods_not_received",
@@ -358,115 +477,796 @@
         "amount_paise": 99900,
         "currency": "INR",
         "payment_method": "upi",
-        "payment_date": "2026-08-10",
-        "order_id": "order_1000000002847",
-        "payment_id": "pay_1000000007391"
+        "payment_date": "2026-08-02",
+        "order_id": "order_1000000002193",
+        "payment_id": "pay_1000000008784"
       },
       "evidence_documents": {
-        "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "service_access_logs": "Service Access Logs is partially available. Document contains incomplete details.",
-        "pre_debit_notification": "Official Pre Debit Notification uploaded by merchant. Document verifies transaction match with valid timestamp."
+        "pre_debit_notification": "Pre Debit Notification is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "mandate_registration_proof": "present",
+        "mandate_registration_proof": "missing",
         "service_access_logs": "weak",
-        "pre_debit_notification": "present",
+        "pre_debit_notification": "weak",
         "cancellation_terms": "missing",
-        "transaction_metadata": "missing"
+        "transaction_metadata": "present"
       },
-      "missing_evidence": ["cancellation_terms", "transaction_metadata"],
-      "weak_evidence": ["service_access_logs"],
-      "expected_completeness_score": 0.60,
-      "expected_confidence": 0.58,
-      "expected_route": "request_more_evidence",
+      "missing_evidence": [
+        "mandate_registration_proof",
+        "cancellation_terms"
+      ],
+      "weak_evidence": [
+        "service_access_logs",
+        "pre_debit_notification"
+      ],
+      "expected_completeness_score": 0.35,
+      "expected_confidence": 0.31,
+      "expected_route": "human_review",
       "expected_outcome": "lost",
-      "split": "train"
+      "split": "test"
     },
     {
-      "dispute_id": "disp_1000000000008",
-      "legacy_dispute_id": "DSP-0008",
-      "merchant_id": "acc_194820",
+      "dispute_id": "disp_1000000000030",
+      "legacy_dispute_id": "DSP-0030",
+      "merchant_id": "acc_348237",
+      "merchant_name": "Zepto Express",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-04",
+        "order_id": "order_1000000003532",
+        "payment_id": "pay_1000000007658"
+      },
+      "evidence_documents": {
+        "reversal_credit_arn": "Official Reversal Credit Arn uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "missing",
+        "order_status_record": "missing",
+        "reversal_credit_arn": "present",
+        "customer_communication": "weak",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": [
+        "rrn_bank_ref_log",
+        "order_status_record",
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.275,
+      "expected_confidence": 0.255,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000011",
+      "legacy_dispute_id": "DSP-0011",
+      "merchant_id": "acc_632342",
       "merchant_name": "UrbanKart India",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 9999,
+        "amount_paise": 999900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-01",
+        "order_id": "order_1000000003927",
+        "payment_id": "pay_1000000009201"
+      },
+      "evidence_documents": {
+        "refund_policy": "Refund Policy is partially available. Document contains incomplete details.",
+        "refund_timeline": "Refund Timeline is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "merchant_terms": "Official Merchant Terms uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "weak",
+        "refund_timeline": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "present",
+        "merchant_terms": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "refund_policy",
+        "refund_timeline"
+      ],
+      "expected_completeness_score": 0.75,
+      "expected_confidence": 0.71,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000044",
+      "legacy_dispute_id": "DSP-0044",
+      "merchant_id": "acc_668969",
+      "merchant_name": "LearnLoop EdTech",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-07",
+        "order_id": "order_1000000006421",
+        "payment_id": "pay_1000000007678"
+      },
+      "evidence_documents": {
+        "ip_device_logs": "Official Ip Device Logs uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "customer_history": "missing",
+        "ip_device_logs": "present",
+        "authentication_signal": "present",
+        "transaction_metadata": "present",
+        "customer_communication": "present"
+      },
+      "missing_evidence": [
+        "customer_history"
+      ],
+      "weak_evidence": [],
+      "expected_completeness_score": 0.8,
+      "expected_confidence": 0.8,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000040",
+      "legacy_dispute_id": "DSP-0040",
+      "merchant_id": "acc_916232",
+      "merchant_name": "LearnLoop EdTech",
       "network": "UPI",
       "reason_code": "U008",
       "reason_category": "upi_fraudulent_collect",
       "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
       "is_adversarial": true,
       "transaction": {
-        "amount": 14999,
-        "amount_paise": 1499900,
+        "amount": 9999,
+        "amount_paise": 999900,
         "currency": "INR",
         "payment_method": "upi",
-        "payment_date": "2026-08-18",
-        "order_id": "order_1000000006249",
-        "payment_id": "pay_1000000001834"
+        "payment_date": "2026-08-05",
+        "order_id": "order_1000000002746",
+        "payment_id": "pay_1000000001090"
       },
       "evidence_documents": {
-        "dynamic_qr_intent_record": "Official Dynamic Qr Intent Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "device_biometric_auth_signal": "UPI 12-digit RRN generated but bank settlement batch response timed out.",
+        "dynamic_qr_intent_record": "AutoPay mandate active on NPCI switch but customer disputed recurring cycle debit.",
+        "device_biometric_auth_signal": "Official Device Biometric Auth Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "itemized_invoice": "Official Itemized Invoice uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "delivery_cctv_or_otp": "Official Delivery Cctv Or Otp uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "dynamic_qr_intent_record": "present",
-        "device_biometric_auth_signal": "weak",
+        "dynamic_qr_intent_record": "weak",
+        "device_biometric_auth_signal": "present",
         "itemized_invoice": "present",
         "delivery_cctv_or_otp": "present",
         "transaction_metadata": "present"
       },
       "missing_evidence": [],
-      "weak_evidence": ["device_biometric_auth_signal"],
-      "expected_completeness_score": 0.875,
-      "expected_confidence": 0.855,
+      "weak_evidence": [
+        "dynamic_qr_intent_record"
+      ],
+      "expected_completeness_score": 0.85,
+      "expected_confidence": 0.83,
       "expected_route": "auto_draft_response",
       "expected_outcome": "won",
-      "split": "train"
+      "split": "test"
     },
     {
-      "dispute_id": "disp_1000000000009",
-      "legacy_dispute_id": "DSP-0009",
-      "merchant_id": "acc_738192",
-      "merchant_name": "UrbanKart India",
-      "network": "CARD",
-      "reason_code": "4553",
-      "reason_category": "goods_not_received",
-      "reason_title": "Goods or services not received",
+      "dispute_id": "disp_1000000000047",
+      "legacy_dispute_id": "DSP-0047",
+      "merchant_id": "acc_513160",
+      "merchant_name": "StyleForge Apparel",
+      "network": "UPI",
+      "reason_code": "U005",
+      "reason_category": "upi_autopay_goods_not_received",
+      "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
       "is_adversarial": false,
       "transaction": {
         "amount": 4999,
         "amount_paise": 499900,
         "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-09",
-        "order_id": "order_1000000009182",
-        "payment_id": "pay_1000000004729"
+        "payment_method": "upi",
+        "payment_date": "2026-08-05",
+        "order_id": "order_1000000001441",
+        "payment_id": "pay_1000000009751"
       },
       "evidence_documents": {
-        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
+        "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "service_access_logs": "Service Access Logs is partially available. Document contains incomplete details.",
+        "pre_debit_notification": "Pre Debit Notification is partially available. Document contains incomplete details.",
+        "cancellation_terms": "Cancellation Terms is partially available. Document contains incomplete details."
       },
       "ground_truth_evidence": {
-        "order_confirmation": "present",
-        "delivery_tracking": "present",
-        "delivery_signature": "missing",
-        "customer_communication": "present",
+        "mandate_registration_proof": "present",
+        "service_access_logs": "weak",
+        "pre_debit_notification": "weak",
+        "cancellation_terms": "weak",
         "transaction_metadata": "missing"
       },
-      "missing_evidence": ["delivery_signature", "transaction_metadata"],
-      "weak_evidence": [],
-      "expected_completeness_score": 0.55,
-      "expected_confidence": 0.55,
+      "missing_evidence": [
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "service_access_logs",
+        "pre_debit_notification",
+        "cancellation_terms"
+      ],
+      "expected_completeness_score": 0.575,
+      "expected_confidence": 0.515,
       "expected_route": "request_more_evidence",
       "expected_outcome": "lost",
       "split": "test"
     },
     {
-      "dispute_id": "disp_1000000000010",
-      "legacy_dispute_id": "DSP-0010",
-      "merchant_id": "acc_294817",
+      "dispute_id": "disp_1000000000023",
+      "legacy_dispute_id": "DSP-0023",
+      "merchant_id": "acc_707040",
       "merchant_name": "StyleForge Apparel",
+      "network": "UPI",
+      "reason_code": "U005",
+      "reason_category": "upi_autopay_goods_not_received",
+      "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 2499,
+        "amount_paise": 249900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-08",
+        "order_id": "order_1000000005033",
+        "payment_id": "pay_1000000002964"
+      },
+      "evidence_documents": {
+        "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "pre_debit_notification": "Official Pre Debit Notification uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "cancellation_terms": "Official Cancellation Terms uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "mandate_registration_proof": "present",
+        "service_access_logs": "missing",
+        "pre_debit_notification": "present",
+        "cancellation_terms": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "service_access_logs"
+      ],
+      "weak_evidence": [
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.65,
+      "expected_confidence": 0.63,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000002",
+      "legacy_dispute_id": "DSP-0002",
+      "merchant_id": "acc_895667",
+      "merchant_name": "Zepto Express",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-14",
+        "order_id": "order_1000000001106",
+        "payment_id": "pay_1000000005557"
+      },
+      "evidence_documents": {
+        "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "return_policy": "Return Policy is partially available. Document contains incomplete details.",
+        "delivery_tracking": "Delivery Tracking is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "product_description": "present",
+        "customer_communication": "weak",
+        "return_policy": "weak",
+        "delivery_tracking": "weak",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "customer_communication",
+        "return_policy",
+        "delivery_tracking",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.625,
+      "expected_confidence": 0.545,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000052",
+      "legacy_dispute_id": "DSP-0052",
+      "merchant_id": "acc_658623",
+      "merchant_name": "LearnLoop EdTech",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-10",
+        "order_id": "order_1000000006688",
+        "payment_id": "pay_1000000001672"
+      },
+      "evidence_documents": {
+        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "ip_device_logs": "Official Ip Device Logs uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "authentication_signal": "AutoPay mandate active on NPCI switch but customer disputed recurring cycle debit.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "customer_history": "present",
+        "ip_device_logs": "present",
+        "authentication_signal": "weak",
+        "transaction_metadata": "present",
+        "customer_communication": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "authentication_signal"
+      ],
+      "expected_completeness_score": 0.875,
+      "expected_confidence": 0.855,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000028",
+      "legacy_dispute_id": "DSP-0028",
+      "merchant_id": "acc_688153",
+      "merchant_name": "UrbanKart India",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 9999,
+        "amount_paise": 999900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-05",
+        "order_id": "order_1000000008007",
+        "payment_id": "pay_1000000008239"
+      },
+      "evidence_documents": {
+        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "ip_device_logs": "Official Ip Device Logs uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "authentication_signal": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "customer_history": "present",
+        "ip_device_logs": "present",
+        "authentication_signal": "weak",
+        "transaction_metadata": "present",
+        "customer_communication": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "authentication_signal"
+      ],
+      "expected_completeness_score": 0.875,
+      "expected_confidence": 0.855,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000035",
+      "legacy_dispute_id": "DSP-0035",
+      "merchant_id": "acc_753425",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-07",
+        "order_id": "order_1000000006409",
+        "payment_id": "pay_1000000002146"
+      },
+      "evidence_documents": {
+        "refund_policy": "Official Refund Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details.",
+        "merchant_terms": "Merchant Terms is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "present",
+        "refund_timeline": "missing",
+        "customer_communication": "weak",
+        "transaction_metadata": "weak",
+        "merchant_terms": "weak"
+      },
+      "missing_evidence": [
+        "refund_timeline"
+      ],
+      "weak_evidence": [
+        "customer_communication",
+        "transaction_metadata",
+        "merchant_terms"
+      ],
+      "expected_completeness_score": 0.5,
+      "expected_confidence": 0.44,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "test"
+    },
+    {
+      "dispute_id": "disp_1000000000021",
+      "legacy_dispute_id": "DSP-0021",
+      "merchant_id": "acc_299122",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-15",
+        "order_id": "order_1000000003536",
+        "payment_id": "pay_1000000008973"
+      },
+      "evidence_documents": {
+        "settlement_record": "Official Settlement Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "original_transaction_id": "missing",
+        "duplicate_transaction_comparison": "missing",
+        "settlement_record": "present",
+        "customer_communication": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "original_transaction_id",
+        "duplicate_transaction_comparison"
+      ],
+      "weak_evidence": [
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.35,
+      "expected_confidence": 0.33,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000015",
+      "legacy_dispute_id": "DSP-0015",
+      "merchant_id": "acc_717024",
+      "merchant_name": "FitNest Wellness",
+      "network": "UPI",
+      "reason_code": "U005",
+      "reason_category": "upi_autopay_goods_not_received",
+      "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-03",
+        "order_id": "order_1000000004770",
+        "payment_id": "pay_1000000001344"
+      },
+      "evidence_documents": {
+        "service_access_logs": "Service Access Logs is partially available. Document contains incomplete details.",
+        "cancellation_terms": "Cancellation Terms is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "mandate_registration_proof": "missing",
+        "service_access_logs": "weak",
+        "pre_debit_notification": "missing",
+        "cancellation_terms": "weak",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "mandate_registration_proof",
+        "pre_debit_notification"
+      ],
+      "weak_evidence": [
+        "service_access_logs",
+        "cancellation_terms",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.275,
+      "expected_confidence": 0.215,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000013",
+      "legacy_dispute_id": "DSP-0013",
+      "merchant_id": "acc_897549",
+      "merchant_name": "StyleForge Apparel",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-19",
+        "order_id": "order_1000000002133",
+        "payment_id": "pay_1000000008962"
+      },
+      "evidence_documents": {
+        "original_transaction_id": "Original Transaction Id is partially available. Document contains incomplete details.",
+        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is partially available. Document contains incomplete details.",
+        "settlement_record": "Settlement Record is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "original_transaction_id": "weak",
+        "duplicate_transaction_comparison": "weak",
+        "settlement_record": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "original_transaction_id",
+        "duplicate_transaction_comparison",
+        "settlement_record"
+      ],
+      "expected_completeness_score": 0.6,
+      "expected_confidence": 0.54,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000045",
+      "legacy_dispute_id": "DSP-0045",
+      "merchant_id": "acc_413118",
+      "merchant_name": "Zepto Express",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 2499,
+        "amount_paise": 249900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-19",
+        "order_id": "order_1000000006763",
+        "payment_id": "pay_1000000001096"
+      },
+      "evidence_documents": {
+        "original_transaction_id": "Original Transaction Id is partially available. Document contains incomplete details.",
+        "duplicate_transaction_comparison": "Duplicate Transaction Comparison is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "original_transaction_id": "weak",
+        "duplicate_transaction_comparison": "weak",
+        "settlement_record": "missing",
+        "customer_communication": "missing",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": [
+        "settlement_record",
+        "customer_communication",
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "original_transaction_id",
+        "duplicate_transaction_comparison"
+      ],
+      "expected_completeness_score": 0.3,
+      "expected_confidence": 0.26,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000043",
+      "legacy_dispute_id": "DSP-0043",
+      "merchant_id": "acc_345884",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-08",
+        "order_id": "order_1000000005681",
+        "payment_id": "pay_1000000002269"
+      },
+      "evidence_documents": {
+        "refund_policy": "Refund Policy is partially available. Document contains incomplete details.",
+        "refund_timeline": "Refund Timeline is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details.",
+        "merchant_terms": "Official Merchant Terms uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "weak",
+        "refund_timeline": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "weak",
+        "merchant_terms": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "refund_policy",
+        "refund_timeline",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.675,
+      "expected_confidence": 0.615,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000059",
+      "legacy_dispute_id": "DSP-0059",
+      "merchant_id": "acc_859782",
+      "merchant_name": "StyleForge Apparel",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-06",
+        "order_id": "order_1000000005530",
+        "payment_id": "pay_1000000008933"
+      },
+      "evidence_documents": {
+        "refund_policy": "Official Refund Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "refund_timeline": "Refund Timeline is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "present",
+        "refund_timeline": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "weak",
+        "merchant_terms": "missing"
+      },
+      "missing_evidence": [
+        "merchant_terms"
+      ],
+      "weak_evidence": [
+        "refund_timeline",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.65,
+      "expected_confidence": 0.61,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000027",
+      "legacy_dispute_id": "DSP-0027",
+      "merchant_id": "acc_363319",
+      "merchant_name": "Zepto Express",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 9999,
+        "amount_paise": 999900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-07",
+        "order_id": "order_1000000009004",
+        "payment_id": "pay_1000000009280"
+      },
+      "evidence_documents": {
+        "refund_policy": "Official Refund Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "present",
+        "refund_timeline": "missing",
+        "customer_communication": "weak",
+        "transaction_metadata": "missing",
+        "merchant_terms": "missing"
+      },
+      "missing_evidence": [
+        "refund_timeline",
+        "transaction_metadata",
+        "merchant_terms"
+      ],
+      "weak_evidence": [
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.35,
+      "expected_confidence": 0.33,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000034",
+      "legacy_dispute_id": "DSP-0034",
+      "merchant_id": "acc_367095",
+      "merchant_name": "UrbanKart India",
       "network": "CARD",
       "reason_code": "4554",
       "reason_category": "product_not_as_described",
@@ -476,10 +1276,582 @@
         "amount": 2499,
         "amount_paise": 249900,
         "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-11",
+        "order_id": "order_1000000004114",
+        "payment_id": "pay_1000000007311"
+      },
+      "evidence_documents": {
+        "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "return_policy": "Official Return Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "product_description": "present",
+        "customer_communication": "missing",
+        "return_policy": "present",
+        "delivery_tracking": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [
+        "customer_communication"
+      ],
+      "weak_evidence": [],
+      "expected_completeness_score": 0.75,
+      "expected_confidence": 0.75,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000014",
+      "legacy_dispute_id": "DSP-0014",
+      "merchant_id": "acc_847581",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
         "payment_method": "upi",
-        "payment_date": "2026-08-12",
-        "order_id": "order_1000000004928",
-        "payment_id": "pay_1000000003819"
+        "payment_date": "2026-08-14",
+        "order_id": "order_1000000004295",
+        "payment_id": "pay_1000000009835"
+      },
+      "evidence_documents": {
+        "rrn_bank_ref_log": "Official Rrn Bank Ref Log uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "order_status_record": "Order Status Record is partially available. Document contains incomplete details.",
+        "reversal_credit_arn": "Reversal Credit Arn is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "present",
+        "order_status_record": "weak",
+        "reversal_credit_arn": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": [
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "order_status_record",
+        "reversal_credit_arn"
+      ],
+      "expected_completeness_score": 0.675,
+      "expected_confidence": 0.635,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000025",
+      "legacy_dispute_id": "DSP-0025",
+      "merchant_id": "acc_238890",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-04",
+        "order_id": "order_1000000005345",
+        "payment_id": "pay_1000000009288"
+      },
+      "evidence_documents": {
+        "order_confirmation": "Order Confirmation is partially available. Document contains incomplete details.",
+        "delivery_tracking": "Delivery Tracking is partially available. Document contains incomplete details.",
+        "delivery_signature": "Official Delivery Signature uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "order_confirmation": "weak",
+        "delivery_tracking": "weak",
+        "delivery_signature": "present",
+        "customer_communication": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "order_confirmation",
+        "delivery_tracking"
+      ],
+      "expected_completeness_score": 0.8,
+      "expected_confidence": 0.76,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000018",
+      "legacy_dispute_id": "DSP-0018",
+      "merchant_id": "acc_863587",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 9999,
+        "amount_paise": 999900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-21",
+        "order_id": "order_1000000007596",
+        "payment_id": "pay_1000000001993"
+      },
+      "evidence_documents": {
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "return_policy": "Return Policy is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "product_description": "missing",
+        "customer_communication": "weak",
+        "return_policy": "weak",
+        "delivery_tracking": "missing",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [
+        "product_description",
+        "delivery_tracking"
+      ],
+      "weak_evidence": [
+        "customer_communication",
+        "return_policy"
+      ],
+      "expected_completeness_score": 0.375,
+      "expected_confidence": 0.335,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000038",
+      "legacy_dispute_id": "DSP-0038",
+      "merchant_id": "acc_197923",
+      "merchant_name": "Zepto Express",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-03",
+        "order_id": "order_1000000006491",
+        "payment_id": "pay_1000000009445"
+      },
+      "evidence_documents": {
+        "rrn_bank_ref_log": "Rrn Bank Ref Log is partially available. Document contains incomplete details.",
+        "order_status_record": "Order Status Record is partially available. Document contains incomplete details.",
+        "reversal_credit_arn": "Reversal Credit Arn is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "weak",
+        "order_status_record": "weak",
+        "reversal_credit_arn": "weak",
+        "customer_communication": "missing",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "customer_communication"
+      ],
+      "weak_evidence": [
+        "rrn_bank_ref_log",
+        "order_status_record",
+        "reversal_credit_arn",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.425,
+      "expected_confidence": 0.345,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000016",
+      "legacy_dispute_id": "DSP-0016",
+      "merchant_id": "acc_392004",
+      "merchant_name": "Swiggy Bharat",
+      "network": "UPI",
+      "reason_code": "U008",
+      "reason_category": "upi_fraudulent_collect",
+      "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-11",
+        "order_id": "order_1000000004899",
+        "payment_id": "pay_1000000009423"
+      },
+      "evidence_documents": {
+        "dynamic_qr_intent_record": "Official Dynamic Qr Intent Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "device_biometric_auth_signal": "Official Device Biometric Auth Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "itemized_invoice": "Official Itemized Invoice uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_cctv_or_otp": "Official Delivery Cctv Or Otp uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "dynamic_qr_intent_record": "present",
+        "device_biometric_auth_signal": "present",
+        "itemized_invoice": "present",
+        "delivery_cctv_or_otp": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [],
+      "expected_completeness_score": 1.0,
+      "expected_confidence": 1.0,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000006",
+      "legacy_dispute_id": "DSP-0006",
+      "merchant_id": "acc_383060",
+      "merchant_name": "Swiggy Bharat",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-08",
+        "order_id": "order_1000000007216",
+        "payment_id": "pay_1000000008573"
+      },
+      "evidence_documents": {
+        "reversal_credit_arn": "Official Reversal Credit Arn uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "missing",
+        "order_status_record": "missing",
+        "reversal_credit_arn": "present",
+        "customer_communication": "missing",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": [
+        "rrn_bank_ref_log",
+        "order_status_record",
+        "customer_communication",
+        "transaction_metadata"
+      ],
+      "weak_evidence": [],
+      "expected_completeness_score": 0.2,
+      "expected_confidence": 0.2,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000020",
+      "legacy_dispute_id": "DSP-0020",
+      "merchant_id": "acc_604740",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-03",
+        "order_id": "order_1000000008956",
+        "payment_id": "pay_1000000007658"
+      },
+      "evidence_documents": {
+        "ip_device_logs": "Support ticket shows customer complained about color mismatch, merchant offered 10% discount but customer didn't reply.",
+        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "customer_history": "missing",
+        "ip_device_logs": "weak",
+        "authentication_signal": "present",
+        "transaction_metadata": "missing",
+        "customer_communication": "missing"
+      },
+      "missing_evidence": [
+        "customer_history",
+        "transaction_metadata",
+        "customer_communication"
+      ],
+      "weak_evidence": [
+        "ip_device_logs"
+      ],
+      "expected_completeness_score": 0.4,
+      "expected_confidence": 0.38,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000036",
+      "legacy_dispute_id": "DSP-0036",
+      "merchant_id": "acc_810219",
+      "merchant_name": "Swiggy Bharat",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 4999,
+        "amount_paise": 499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-10",
+        "order_id": "order_1000000007211",
+        "payment_id": "pay_1000000007888"
+      },
+      "evidence_documents": {
+        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Support ticket shows customer complained about color mismatch, merchant offered 10% discount but customer didn't reply."
+      },
+      "ground_truth_evidence": {
+        "customer_history": "present",
+        "ip_device_logs": "missing",
+        "authentication_signal": "missing",
+        "transaction_metadata": "missing",
+        "customer_communication": "weak"
+      },
+      "missing_evidence": [
+        "ip_device_logs",
+        "authentication_signal",
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.25,
+      "expected_confidence": 0.23,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000010",
+      "legacy_dispute_id": "DSP-0010",
+      "merchant_id": "acc_814825",
+      "merchant_name": "StyleForge Apparel",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 4999,
+        "amount_paise": 499900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-15",
+        "order_id": "order_1000000002876",
+        "payment_id": "pay_1000000001188"
+      },
+      "evidence_documents": {
+        "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "return_policy": "Official Return Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "product_description": "present",
+        "customer_communication": "weak",
+        "return_policy": "present",
+        "delivery_tracking": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.875,
+      "expected_confidence": 0.855,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000046",
+      "legacy_dispute_id": "DSP-0046",
+      "merchant_id": "acc_386193",
+      "merchant_name": "LearnLoop EdTech",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-20",
+        "order_id": "order_1000000004595",
+        "payment_id": "pay_1000000008999"
+      },
+      "evidence_documents": {
+        "rrn_bank_ref_log": "Official Rrn Bank Ref Log uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "order_status_record": "Order Status Record is partially available. Document contains incomplete details.",
+        "reversal_credit_arn": "Reversal Credit Arn is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "present",
+        "order_status_record": "weak",
+        "reversal_credit_arn": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "order_status_record",
+        "reversal_credit_arn",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.725,
+      "expected_confidence": 0.665,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000053",
+      "legacy_dispute_id": "DSP-0053",
+      "merchant_id": "acc_841666",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-16",
+        "order_id": "order_1000000008532",
+        "payment_id": "pay_1000000006934"
+      },
+      "evidence_documents": {
+        "original_transaction_id": "Original Transaction Id is partially available. Document contains incomplete details.",
+        "duplicate_transaction_comparison": "Official Duplicate Transaction Comparison uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "settlement_record": "Settlement Record is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "original_transaction_id": "weak",
+        "duplicate_transaction_comparison": "present",
+        "settlement_record": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "original_transaction_id",
+        "settlement_record",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.725,
+      "expected_confidence": 0.665,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000042",
+      "legacy_dispute_id": "DSP-0042",
+      "merchant_id": "acc_571932",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-14",
+        "order_id": "order_1000000008777",
+        "payment_id": "pay_1000000003607"
+      },
+      "evidence_documents": {
+        "product_description": "Product Description is partially available. Document contains incomplete details.",
+        "return_policy": "Return Policy is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "product_description": "weak",
+        "customer_communication": "missing",
+        "return_policy": "weak",
+        "delivery_tracking": "missing",
+        "transaction_metadata": "missing"
+      },
+      "missing_evidence": [
+        "customer_communication",
+        "delivery_tracking",
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "product_description",
+        "return_policy"
+      ],
+      "expected_completeness_score": 0.225,
+      "expected_confidence": 0.185,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000058",
+      "legacy_dispute_id": "DSP-0058",
+      "merchant_id": "acc_421517",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-18",
+        "order_id": "order_1000000005438",
+        "payment_id": "pay_1000000008434"
       },
       "evidence_documents": {
         "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
@@ -501,13 +1873,496 @@
       "expected_confidence": 1.0,
       "expected_route": "auto_draft_response",
       "expected_outcome": "won",
-      "split": "test"
+      "split": "train"
     },
     {
-      "dispute_id": "disp_1000000000011",
-      "legacy_dispute_id": "DSP-0011",
-      "merchant_id": "acc_849201",
+      "dispute_id": "disp_1000000000026",
+      "legacy_dispute_id": "DSP-0026",
+      "merchant_id": "acc_240814",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-20",
+        "order_id": "order_1000000002697",
+        "payment_id": "pay_1000000005905"
+      },
+      "evidence_documents": {
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "return_policy": "Official Return Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "product_description": "missing",
+        "customer_communication": "present",
+        "return_policy": "present",
+        "delivery_tracking": "missing",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "product_description",
+        "delivery_tracking"
+      ],
+      "weak_evidence": [
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.525,
+      "expected_confidence": 0.505,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000005",
+      "legacy_dispute_id": "DSP-0005",
+      "merchant_id": "acc_802729",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 999,
+        "amount_paise": 99900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-12",
+        "order_id": "order_1000000004432",
+        "payment_id": "pay_1000000006820"
+      },
+      "evidence_documents": {
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "original_transaction_id": "missing",
+        "duplicate_transaction_comparison": "missing",
+        "settlement_record": "missing",
+        "customer_communication": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "original_transaction_id",
+        "duplicate_transaction_comparison",
+        "settlement_record"
+      ],
+      "weak_evidence": [
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.15,
+      "expected_confidence": 0.13,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000008",
+      "legacy_dispute_id": "DSP-0008",
+      "merchant_id": "acc_246413",
       "merchant_name": "FitNest Wellness",
+      "network": "UPI",
+      "reason_code": "U008",
+      "reason_category": "upi_fraudulent_collect",
+      "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 9999,
+        "amount_paise": 999900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-13",
+        "order_id": "order_1000000005339",
+        "payment_id": "pay_1000000003340"
+      },
+      "evidence_documents": {
+        "dynamic_qr_intent_record": "Official Dynamic Qr Intent Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_cctv_or_otp": "Official Delivery Cctv Or Otp uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Refund initiated via gateway but pending bank settlement confirmation."
+      },
+      "ground_truth_evidence": {
+        "dynamic_qr_intent_record": "present",
+        "device_biometric_auth_signal": "missing",
+        "itemized_invoice": "missing",
+        "delivery_cctv_or_otp": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "device_biometric_auth_signal",
+        "itemized_invoice"
+      ],
+      "weak_evidence": [
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.5,
+      "expected_confidence": 0.48,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000050",
+      "legacy_dispute_id": "DSP-0050",
+      "merchant_id": "acc_833442",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4554",
+      "reason_category": "product_not_as_described",
+      "reason_title": "Product or service not as described",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 9999,
+        "amount_paise": 999900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-16",
+        "order_id": "order_1000000008619",
+        "payment_id": "pay_1000000004571"
+      },
+      "evidence_documents": {
+        "product_description": "Official Product Description uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Delivery Tracking is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "product_description": "present",
+        "customer_communication": "present",
+        "return_policy": "missing",
+        "delivery_tracking": "weak",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [
+        "return_policy"
+      ],
+      "weak_evidence": [
+        "delivery_tracking"
+      ],
+      "expected_completeness_score": 0.725,
+      "expected_confidence": 0.705,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000017",
+      "legacy_dispute_id": "DSP-0017",
+      "merchant_id": "acc_198907",
+      "merchant_name": "UrbanKart India",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-08",
+        "order_id": "order_1000000004119",
+        "payment_id": "pay_1000000007669"
+      },
+      "evidence_documents": {
+        "order_confirmation": "Order Confirmation is partially available. Document contains incomplete details.",
+        "delivery_tracking": "Delivery Tracking is partially available. Document contains incomplete details.",
+        "delivery_signature": "Delivery Signature is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "order_confirmation": "weak",
+        "delivery_tracking": "weak",
+        "delivery_signature": "weak",
+        "customer_communication": "missing",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [
+        "customer_communication"
+      ],
+      "weak_evidence": [
+        "order_confirmation",
+        "delivery_tracking",
+        "delivery_signature",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.425,
+      "expected_confidence": 0.345,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000004",
+      "legacy_dispute_id": "DSP-0004",
+      "merchant_id": "acc_793384",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-20",
+        "order_id": "order_1000000001750",
+        "payment_id": "pay_1000000002139"
+      },
+      "evidence_documents": {
+        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check."
+      },
+      "ground_truth_evidence": {
+        "customer_history": "present",
+        "ip_device_logs": "missing",
+        "authentication_signal": "present",
+        "transaction_metadata": "present",
+        "customer_communication": "weak"
+      },
+      "missing_evidence": [
+        "ip_device_logs"
+      ],
+      "weak_evidence": [
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.65,
+      "expected_confidence": 0.63,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000012",
+      "legacy_dispute_id": "DSP-0012",
+      "merchant_id": "acc_120422",
+      "merchant_name": "UrbanKart India",
+      "network": "CARD",
+      "reason_code": "4540",
+      "reason_category": "unauthorized_fraud",
+      "reason_title": "Fraud or unauthorized transaction",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-18",
+        "order_id": "order_1000000009005",
+        "payment_id": "pay_1000000006310"
+      },
+      "evidence_documents": {
+        "customer_history": "UPI 12-digit RRN generated but bank settlement batch response timed out.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "customer_history": "weak",
+        "ip_device_logs": "missing",
+        "authentication_signal": "missing",
+        "transaction_metadata": "present",
+        "customer_communication": "missing"
+      },
+      "missing_evidence": [
+        "ip_device_logs",
+        "authentication_signal",
+        "customer_communication"
+      ],
+      "weak_evidence": [
+        "customer_history"
+      ],
+      "expected_completeness_score": 0.25,
+      "expected_confidence": 0.23,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000022",
+      "legacy_dispute_id": "DSP-0022",
+      "merchant_id": "acc_994141",
+      "merchant_name": "StyleForge Apparel",
+      "network": "UPI",
+      "reason_code": "U001",
+      "reason_category": "upi_credit_failed",
+      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 4999,
+        "amount_paise": 499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-02",
+        "order_id": "order_1000000009238",
+        "payment_id": "pay_1000000008811"
+      },
+      "evidence_documents": {
+        "rrn_bank_ref_log": "Official Rrn Bank Ref Log uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "order_status_record": "Official Order Status Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "reversal_credit_arn": "Reversal Credit Arn is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "rrn_bank_ref_log": "present",
+        "order_status_record": "present",
+        "reversal_credit_arn": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "reversal_credit_arn"
+      ],
+      "expected_completeness_score": 0.9,
+      "expected_confidence": 0.88,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000029",
+      "legacy_dispute_id": "DSP-0029",
+      "merchant_id": "acc_143860",
+      "merchant_name": "CloudKitchen Pro",
+      "network": "CARD",
+      "reason_code": "4521",
+      "reason_category": "duplicate_charge",
+      "reason_title": "Duplicate processing",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 4999,
+        "amount_paise": 499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-12",
+        "order_id": "order_1000000003088",
+        "payment_id": "pay_1000000008041"
+      },
+      "evidence_documents": {
+        "original_transaction_id": "Official Original Transaction Id uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "settlement_record": "Settlement Record is partially available. Document contains incomplete details.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "original_transaction_id": "present",
+        "duplicate_transaction_comparison": "missing",
+        "settlement_record": "weak",
+        "customer_communication": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [
+        "duplicate_transaction_comparison"
+      ],
+      "weak_evidence": [
+        "settlement_record"
+      ],
+      "expected_completeness_score": 0.55,
+      "expected_confidence": 0.53,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000051",
+      "legacy_dispute_id": "DSP-0051",
+      "merchant_id": "acc_515922",
+      "merchant_name": "Swiggy Bharat",
+      "network": "CARD",
+      "reason_code": "4513",
+      "reason_category": "refund_not_processed",
+      "reason_title": "Credit not processed",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "card",
+        "payment_date": "2026-08-10",
+        "order_id": "order_1000000007149",
+        "payment_id": "pay_1000000006111"
+      },
+      "evidence_documents": {
+        "refund_policy": "Official Refund Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "refund_policy": "present",
+        "refund_timeline": "missing",
+        "customer_communication": "missing",
+        "transaction_metadata": "present",
+        "merchant_terms": "missing"
+      },
+      "missing_evidence": [
+        "refund_timeline",
+        "customer_communication",
+        "merchant_terms"
+      ],
+      "weak_evidence": [],
+      "expected_completeness_score": 0.4,
+      "expected_confidence": 0.4,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000031",
+      "legacy_dispute_id": "DSP-0031",
+      "merchant_id": "acc_379766",
+      "merchant_name": "FitNest Wellness",
+      "network": "UPI",
+      "reason_code": "U005",
+      "reason_category": "upi_autopay_goods_not_received",
+      "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 14999,
+        "amount_paise": 1499900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-11",
+        "order_id": "order_1000000005065",
+        "payment_id": "pay_1000000007745"
+      },
+      "evidence_documents": {
+        "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "service_access_logs": "Service Access Logs is partially available. Document contains incomplete details.",
+        "pre_debit_notification": "Official Pre Debit Notification uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "cancellation_terms": "Official Cancellation Terms uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "mandate_registration_proof": "present",
+        "service_access_logs": "weak",
+        "pre_debit_notification": "present",
+        "cancellation_terms": "present",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "service_access_logs"
+      ],
+      "expected_completeness_score": 0.85,
+      "expected_confidence": 0.83,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000019",
+      "legacy_dispute_id": "DSP-0019",
+      "merchant_id": "acc_564656",
+      "merchant_name": "Zepto Express",
       "network": "CARD",
       "reason_code": "4513",
       "reason_category": "refund_not_processed",
@@ -519,189 +2374,255 @@
         "currency": "INR",
         "payment_method": "netbanking",
         "payment_date": "2026-08-06",
-        "order_id": "order_1000000001849",
-        "payment_id": "pay_1000000007291"
-      },
-      "evidence_documents": {},
-      "ground_truth_evidence": {
-        "refund_policy": "missing",
-        "refund_timeline": "missing",
-        "customer_communication": "missing",
-        "transaction_metadata": "missing",
-        "merchant_terms": "missing"
-      },
-      "missing_evidence": ["refund_policy", "refund_timeline", "customer_communication", "transaction_metadata", "merchant_terms"],
-      "weak_evidence": [],
-      "expected_completeness_score": 0.0,
-      "expected_confidence": 0.0,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "test"
-    },
-    {
-      "dispute_id": "disp_1000000000012",
-      "legacy_dispute_id": "DSP-0012",
-      "merchant_id": "acc_492018",
-      "merchant_name": "LearnLoop EdTech",
-      "network": "CARD",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "is_adversarial": true,
-      "transaction": {
-        "amount": 9999,
-        "amount_paise": 999900,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-17",
-        "order_id": "order_1000000008392",
-        "payment_id": "pay_1000000005721"
+        "order_id": "order_1000000002235",
+        "payment_id": "pay_1000000005092"
       },
       "evidence_documents": {
-        "customer_history": "Customer History is partially available. Document contains incomplete details.",
-        "ip_device_logs": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
-        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+        "refund_policy": "Refund Policy is partially available. Document contains incomplete details.",
+        "refund_timeline": "Official Refund Timeline uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "merchant_terms": "Official Merchant Terms uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "customer_history": "weak",
-        "ip_device_logs": "weak",
-        "authentication_signal": "present",
+        "refund_policy": "weak",
+        "refund_timeline": "present",
+        "customer_communication": "present",
         "transaction_metadata": "present",
-        "customer_communication": "missing"
+        "merchant_terms": "present"
       },
-      "missing_evidence": ["customer_communication"],
-      "weak_evidence": ["customer_history", "ip_device_logs"],
-      "expected_completeness_score": 0.65,
-      "expected_confidence": 0.61,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "test"
+      "missing_evidence": [],
+      "weak_evidence": [
+        "refund_policy"
+      ],
+      "expected_completeness_score": 0.875,
+      "expected_confidence": 0.855,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
     },
     {
-      "dispute_id": "disp_1000000000013",
-      "legacy_dispute_id": "DSP-0013",
-      "merchant_id": "acc_391048",
-      "merchant_name": "CloudKitchen Pro",
+      "dispute_id": "disp_1000000000037",
+      "legacy_dispute_id": "DSP-0037",
+      "merchant_id": "acc_563246",
+      "merchant_name": "LearnLoop EdTech",
       "network": "CARD",
       "reason_code": "4521",
       "reason_category": "duplicate_charge",
       "reason_title": "Duplicate processing",
       "is_adversarial": false,
       "transaction": {
-        "amount": 499,
-        "amount_paise": 49900,
+        "amount": 999,
+        "amount_paise": 99900,
         "currency": "INR",
-        "payment_method": "wallet",
-        "payment_date": "2026-08-03",
-        "order_id": "order_1000000002918",
-        "payment_id": "pay_1000000008472"
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-10",
+        "order_id": "order_1000000008618",
+        "payment_id": "pay_1000000006279"
       },
       "evidence_documents": {
-        "original_transaction_id": "Original Transaction Id is partially available. Document contains incomplete details."
-      },
-      "ground_truth_evidence": {
-        "original_transaction_id": "weak",
-        "duplicate_transaction_comparison": "missing",
-        "settlement_record": "missing",
-        "customer_communication": "missing",
-        "transaction_metadata": "missing"
-      },
-      "missing_evidence": ["duplicate_transaction_comparison", "settlement_record", "customer_communication", "transaction_metadata"],
-      "weak_evidence": ["original_transaction_id"],
-      "expected_completeness_score": 0.125,
-      "expected_confidence": 0.105,
-      "expected_route": "human_review",
-      "expected_outcome": "lost",
-      "split": "test"
-    },
-    {
-      "dispute_id": "disp_1000000000014",
-      "legacy_dispute_id": "DSP-0014",
-      "merchant_id": "acc_719482",
-      "merchant_name": "Swiggy Bharat",
-      "network": "UPI",
-      "reason_code": "U001",
-      "reason_category": "upi_credit_failed",
-      "reason_title": "Account debited, merchant credit failed (UDIR Decline)",
-      "is_adversarial": false,
-      "transaction": {
-        "amount": 1499,
-        "amount_paise": 149900,
-        "currency": "INR",
-        "payment_method": "upi",
-        "payment_date": "2026-08-13",
-        "order_id": "order_1000000007391",
-        "payment_id": "pay_1000000006184"
-      },
-      "evidence_documents": {
-        "rrn_bank_ref_log": "Official Rrn Bank Ref Log uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "order_status_record": "Official Order Status Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "reversal_credit_arn": "Official Reversal Credit Arn uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "original_transaction_id": "Original Transaction Id is partially available. Document contains incomplete details.",
+        "duplicate_transaction_comparison": "Official Duplicate Transaction Comparison uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "settlement_record": "Official Settlement Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "rrn_bank_ref_log": "present",
-        "order_status_record": "present",
-        "reversal_credit_arn": "present",
+        "original_transaction_id": "weak",
+        "duplicate_transaction_comparison": "present",
+        "settlement_record": "present",
         "customer_communication": "present",
         "transaction_metadata": "present"
       },
       "missing_evidence": [],
-      "weak_evidence": [],
-      "expected_completeness_score": 1.0,
-      "expected_confidence": 1.0,
+      "weak_evidence": [
+        "original_transaction_id"
+      ],
+      "expected_completeness_score": 0.875,
+      "expected_confidence": 0.855,
       "expected_route": "auto_draft_response",
       "expected_outcome": "won",
-      "split": "test"
+      "split": "train"
     },
     {
-      "dispute_id": "disp_1000000000015",
-      "legacy_dispute_id": "DSP-0015",
-      "merchant_id": "acc_582910",
-      "merchant_name": "Zepto Express",
+      "dispute_id": "disp_1000000000001",
+      "legacy_dispute_id": "DSP-0001",
+      "merchant_id": "acc_198246",
+      "merchant_name": "FitNest Wellness",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "netbanking",
+        "payment_date": "2026-08-18",
+        "order_id": "order_1000000001488",
+        "payment_id": "pay_1000000001520"
+      },
+      "evidence_documents": {
+        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_signature": "Official Delivery Signature uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
+      },
+      "ground_truth_evidence": {
+        "order_confirmation": "present",
+        "delivery_tracking": "present",
+        "delivery_signature": "present",
+        "customer_communication": "present",
+        "transaction_metadata": "weak"
+      },
+      "missing_evidence": [],
+      "weak_evidence": [
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.925,
+      "expected_confidence": 0.905,
+      "expected_route": "auto_draft_response",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000007",
+      "legacy_dispute_id": "DSP-0007",
+      "merchant_id": "acc_380746",
+      "merchant_name": "UrbanKart India",
       "network": "UPI",
       "reason_code": "U005",
       "reason_category": "upi_autopay_goods_not_received",
       "reason_title": "UPI AutoPay Recurring Subscription Goods / Service Not Provided",
       "is_adversarial": false,
       "transaction": {
-        "amount": 2499,
-        "amount_paise": 249900,
+        "amount": 14999,
+        "amount_paise": 1499900,
         "currency": "INR",
         "payment_method": "upi",
-        "payment_date": "2026-08-07",
-        "order_id": "order_1000000004819",
-        "payment_id": "pay_1000000009281"
+        "payment_date": "2026-08-02",
+        "order_id": "order_1000000007572",
+        "payment_id": "pay_1000000006168"
       },
       "evidence_documents": {
         "mandate_registration_proof": "Official Mandate Registration Proof uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "service_access_logs": "Official Service Access Logs uploaded by merchant. Document verifies transaction match with valid timestamp.",
         "pre_debit_notification": "Official Pre Debit Notification uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "cancellation_terms": "Official Cancellation Terms uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "cancellation_terms": "Cancellation Terms is partially available. Document contains incomplete details.",
         "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
         "mandate_registration_proof": "present",
         "service_access_logs": "present",
         "pre_debit_notification": "present",
-        "cancellation_terms": "present",
+        "cancellation_terms": "weak",
         "transaction_metadata": "present"
       },
       "missing_evidence": [],
-      "weak_evidence": [],
-      "expected_completeness_score": 1.0,
-      "expected_confidence": 1.0,
+      "weak_evidence": [
+        "cancellation_terms"
+      ],
+      "expected_completeness_score": 0.925,
+      "expected_confidence": 0.905,
       "expected_route": "auto_draft_response",
       "expected_outcome": "won",
-      "split": "test"
+      "split": "train"
     },
     {
-      "dispute_id": "disp_1000000000016",
-      "legacy_dispute_id": "DSP-0016",
-      "merchant_id": "acc_849102",
-      "merchant_name": "UrbanKart India",
+      "dispute_id": "disp_1000000000032",
+      "legacy_dispute_id": "DSP-0032",
+      "merchant_id": "acc_124813",
+      "merchant_name": "Swiggy Bharat",
+      "network": "UPI",
+      "reason_code": "U008",
+      "reason_category": "upi_fraudulent_collect",
+      "reason_title": "Fraudulent Collect Request / Unauthorized QR Scan",
+      "is_adversarial": true,
+      "transaction": {
+        "amount": 1499,
+        "amount_paise": 149900,
+        "currency": "INR",
+        "payment_method": "upi",
+        "payment_date": "2026-08-15",
+        "order_id": "order_1000000004652",
+        "payment_id": "pay_1000000004728"
+      },
+      "evidence_documents": {
+        "dynamic_qr_intent_record": "IP address logged from Mumbai suburb, matching billing state but failing 3DS device fingerprint check.",
+        "device_biometric_auth_signal": "Official Device Biometric Auth Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "dynamic_qr_intent_record": "weak",
+        "device_biometric_auth_signal": "present",
+        "itemized_invoice": "missing",
+        "delivery_cctv_or_otp": "missing",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [
+        "itemized_invoice",
+        "delivery_cctv_or_otp"
+      ],
+      "weak_evidence": [
+        "dynamic_qr_intent_record"
+      ],
+      "expected_completeness_score": 0.5,
+      "expected_confidence": 0.48,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000049",
+      "legacy_dispute_id": "DSP-0049",
+      "merchant_id": "acc_919182",
+      "merchant_name": "Swiggy Bharat",
+      "network": "CARD",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
+      "is_adversarial": false,
+      "transaction": {
+        "amount": 499,
+        "amount_paise": 49900,
+        "currency": "INR",
+        "payment_method": "wallet",
+        "payment_date": "2026-08-18",
+        "order_id": "order_1000000002124",
+        "payment_id": "pay_1000000004673"
+      },
+      "evidence_documents": {
+        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_signature": "Official Delivery Signature uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
+      },
+      "ground_truth_evidence": {
+        "order_confirmation": "present",
+        "delivery_tracking": "missing",
+        "delivery_signature": "present",
+        "customer_communication": "weak",
+        "transaction_metadata": "present"
+      },
+      "missing_evidence": [
+        "delivery_tracking"
+      ],
+      "weak_evidence": [
+        "customer_communication"
+      ],
+      "expected_completeness_score": 0.675,
+      "expected_confidence": 0.655,
+      "expected_route": "request_more_evidence",
+      "expected_outcome": "won",
+      "split": "train"
+    },
+    {
+      "dispute_id": "disp_1000000000056",
+      "legacy_dispute_id": "DSP-0056",
+      "merchant_id": "acc_189771",
+      "merchant_name": "FitNest Wellness",
       "network": "UPI",
       "reason_code": "U008",
       "reason_category": "upi_fraudulent_collect",
@@ -712,32 +2633,39 @@
         "amount_paise": 499900,
         "currency": "INR",
         "payment_method": "upi",
-        "payment_date": "2026-08-19",
-        "order_id": "order_1000000003819",
-        "payment_id": "pay_1000000002918"
+        "payment_date": "2026-08-09",
+        "order_id": "order_1000000004130",
+        "payment_id": "pay_1000000009464"
       },
       "evidence_documents": {
-        "dynamic_qr_intent_record": "Dynamic Qr Intent Record is partially available. Document contains incomplete details."
+        "dynamic_qr_intent_record": "Official Dynamic Qr Intent Record uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "device_biometric_auth_signal": "Official Device Biometric Auth Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "itemized_invoice": "Courier log indicates item dropped off at building mailroom on Aug 12, but no physical customer signature collected.",
+        "delivery_cctv_or_otp": "Official Delivery Cctv Or Otp uploaded by merchant. Document verifies transaction match with valid timestamp."
       },
       "ground_truth_evidence": {
-        "dynamic_qr_intent_record": "weak",
-        "device_biometric_auth_signal": "missing",
-        "itemized_invoice": "missing",
-        "delivery_cctv_or_otp": "missing",
+        "dynamic_qr_intent_record": "present",
+        "device_biometric_auth_signal": "present",
+        "itemized_invoice": "weak",
+        "delivery_cctv_or_otp": "present",
         "transaction_metadata": "missing"
       },
-      "missing_evidence": ["device_biometric_auth_signal", "itemized_invoice", "delivery_cctv_or_otp", "transaction_metadata"],
-      "weak_evidence": ["dynamic_qr_intent_record"],
-      "expected_completeness_score": 0.15,
-      "expected_confidence": 0.13,
-      "expected_route": "human_review",
+      "missing_evidence": [
+        "transaction_metadata"
+      ],
+      "weak_evidence": [
+        "itemized_invoice"
+      ],
+      "expected_completeness_score": 0.8,
+      "expected_confidence": 0.78,
+      "expected_route": "auto_draft_response",
       "expected_outcome": "lost",
-      "split": "test"
+      "split": "train"
     },
     {
-      "dispute_id": "disp_1000000000017",
-      "legacy_dispute_id": "DSP-0017",
-      "merchant_id": "acc_619482",
+      "dispute_id": "disp_1000000000041",
+      "legacy_dispute_id": "DSP-0041",
+      "merchant_id": "acc_686075",
       "merchant_name": "StyleForge Apparel",
       "network": "CARD",
       "reason_code": "4553",
@@ -745,153 +2673,85 @@
       "reason_title": "Goods or services not received",
       "is_adversarial": false,
       "transaction": {
-        "amount": 1499,
-        "amount_paise": 149900,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-05",
-        "order_id": "order_1000000001928",
-        "payment_id": "pay_1000000008391"
-      },
-      "evidence_documents": {
-        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "delivery_tracking": "Official Delivery Tracking uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "delivery_signature": "Delivery Signature is partially available. Document contains incomplete details.",
-        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
-      },
-      "ground_truth_evidence": {
-        "order_confirmation": "present",
-        "delivery_tracking": "present",
-        "delivery_signature": "weak",
-        "customer_communication": "present",
-        "transaction_metadata": "present"
-      },
-      "missing_evidence": [],
-      "weak_evidence": ["delivery_signature"],
-      "expected_completeness_score": 0.85,
-      "expected_confidence": 0.83,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "test"
-    },
-    {
-      "dispute_id": "disp_1000000000018",
-      "legacy_dispute_id": "DSP-0018",
-      "merchant_id": "acc_481029",
-      "merchant_name": "FitNest Wellness",
-      "network": "CARD",
-      "reason_code": "4554",
-      "reason_category": "product_not_as_described",
-      "reason_title": "Product or service not as described",
-      "is_adversarial": false,
-      "transaction": {
         "amount": 2499,
         "amount_paise": 249900,
         "currency": "INR",
         "payment_method": "upi",
-        "payment_date": "2026-08-11",
-        "order_id": "order_1000000007281",
-        "payment_id": "pay_1000000004918"
+        "payment_date": "2026-08-04",
+        "order_id": "order_1000000009702",
+        "payment_id": "pay_1000000008612"
       },
       "evidence_documents": {
-        "product_description": "Product Description is partially available. Document contains incomplete details."
+        "order_confirmation": "Official Order Confirmation uploaded by merchant. Document verifies transaction match with valid timestamp.",
+        "delivery_signature": "Delivery Signature is partially available. Document contains incomplete details.",
+        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
       },
       "ground_truth_evidence": {
-        "product_description": "weak",
-        "customer_communication": "missing",
-        "return_policy": "missing",
+        "order_confirmation": "present",
         "delivery_tracking": "missing",
-        "transaction_metadata": "missing"
+        "delivery_signature": "weak",
+        "customer_communication": "weak",
+        "transaction_metadata": "weak"
       },
-      "missing_evidence": ["customer_communication", "return_policy", "delivery_tracking", "transaction_metadata"],
-      "weak_evidence": ["product_description"],
-      "expected_completeness_score": 0.125,
-      "expected_confidence": 0.105,
+      "missing_evidence": [
+        "delivery_tracking"
+      ],
+      "weak_evidence": [
+        "delivery_signature",
+        "customer_communication",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.45,
+      "expected_confidence": 0.39,
       "expected_route": "human_review",
       "expected_outcome": "lost",
-      "split": "test"
+      "split": "train"
     },
     {
-      "dispute_id": "disp_1000000000019",
-      "legacy_dispute_id": "DSP-0019",
-      "merchant_id": "acc_928174",
-      "merchant_name": "CloudKitchen Pro",
+      "dispute_id": "disp_1000000000009",
+      "legacy_dispute_id": "DSP-0009",
+      "merchant_id": "acc_214975",
+      "merchant_name": "FitNest Wellness",
       "network": "CARD",
-      "reason_code": "4513",
-      "reason_category": "refund_not_processed",
-      "reason_title": "Credit not processed",
+      "reason_code": "4553",
+      "reason_category": "goods_not_received",
+      "reason_title": "Goods or services not received",
       "is_adversarial": false,
       "transaction": {
-        "amount": 999,
-        "amount_paise": 99900,
-        "currency": "INR",
-        "payment_method": "card",
-        "payment_date": "2026-08-14",
-        "order_id": "order_1000000005829",
-        "payment_id": "pay_1000000001928"
-      },
-      "evidence_documents": {
-        "refund_policy": "Official Refund Policy uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "refund_timeline": "Official Refund Timeline uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "customer_communication": "Customer Communication is partially available. Document contains incomplete details.",
-        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp."
-      },
-      "ground_truth_evidence": {
-        "refund_policy": "present",
-        "refund_timeline": "present",
-        "customer_communication": "weak",
-        "transaction_metadata": "present",
-        "merchant_terms": "missing"
-      },
-      "missing_evidence": ["merchant_terms"],
-      "weak_evidence": ["customer_communication"],
-      "expected_completeness_score": 0.75,
-      "expected_confidence": 0.73,
-      "expected_route": "request_more_evidence",
-      "expected_outcome": "lost",
-      "split": "test"
-    },
-    {
-      "dispute_id": "disp_1000000000020",
-      "legacy_dispute_id": "DSP-0020",
-      "merchant_id": "acc_381920",
-      "merchant_name": "LearnLoop EdTech",
-      "network": "CARD",
-      "reason_code": "4540",
-      "reason_category": "unauthorized_fraud",
-      "reason_title": "Fraud or unauthorized transaction",
-      "is_adversarial": true,
-      "transaction": {
-        "amount": 9999,
-        "amount_paise": 999900,
+        "amount": 4999,
+        "amount_paise": 499900,
         "currency": "INR",
         "payment_method": "netbanking",
-        "payment_date": "2026-08-20",
-        "order_id": "order_1000000009184",
-        "payment_id": "pay_1000000003812"
+        "payment_date": "2026-08-05",
+        "order_id": "order_1000000001771",
+        "payment_id": "pay_1000000002489"
       },
       "evidence_documents": {
-        "customer_history": "Official Customer History uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "ip_device_logs": "Official Ip Device Logs uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "authentication_signal": "Official Authentication Signal uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "transaction_metadata": "Official Transaction Metadata uploaded by merchant. Document verifies transaction match with valid timestamp.",
-        "customer_communication": "Official Customer Communication uploaded by merchant. Document verifies transaction match with valid timestamp."
+        "delivery_signature": "Delivery Signature is partially available. Document contains incomplete details.",
+        "transaction_metadata": "Transaction Metadata is partially available. Document contains incomplete details."
       },
       "ground_truth_evidence": {
-        "customer_history": "present",
-        "ip_device_logs": "present",
-        "authentication_signal": "present",
-        "transaction_metadata": "present",
-        "customer_communication": "present"
+        "order_confirmation": "missing",
+        "delivery_tracking": "missing",
+        "delivery_signature": "weak",
+        "customer_communication": "missing",
+        "transaction_metadata": "weak"
       },
-      "missing_evidence": [],
-      "weak_evidence": [],
-      "expected_completeness_score": 1.0,
-      "expected_confidence": 1.0,
-      "expected_route": "auto_draft_response",
-      "expected_outcome": "won",
-      "split": "test"
+      "missing_evidence": [
+        "order_confirmation",
+        "delivery_tracking",
+        "customer_communication"
+      ],
+      "weak_evidence": [
+        "delivery_signature",
+        "transaction_metadata"
+      ],
+      "expected_completeness_score": 0.225,
+      "expected_confidence": 0.185,
+      "expected_route": "human_review",
+      "expected_outcome": "lost",
+      "split": "train"
     }
   ]
 }

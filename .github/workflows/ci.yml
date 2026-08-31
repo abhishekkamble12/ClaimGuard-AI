@@ -25,14 +25,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Generate Benchmark Synthetic Dataset
+      - name: Code Quality & Linting (flake8)
         run: |
-          python data_generator.py --cases 60 --test-ratio 0.33 --out outputs/synthetic_chargeback_dataset.json
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=15 --max-line-length=127 --statistics
 
-      - name: Run Unit & Edge Case Test Suite
+      - name: Security Vulnerability Scan (bandit)
         run: |
-          python -m unittest discover -s eval -p "test_*.py" -v
+          bandit -r ml/ scoring/ api/ intelligence/ monitoring/ utils/ -s B101,B104,B105 --exit-zero
 
-      - name: Run ProofPilot Evaluation Benchmark
+      - name: Generate Benchmark Synthetic Dataset (500 cases)
         run: |
-          python eval/evaluate.py
+          python data_generator.py --cases 500 --test-ratio 0.25 --out outputs/synthetic_chargeback_dataset.json
+
+      - name: Train and Validate Calibrated Stacked Ensemble Model
+        run: |
+          python ml/win_predictor.py
+          python -c "import json; m=json.load(open('outputs/model_comparison.json')); assert m['models']['stacked_ensemble']['roc_auc'] >= 0.85, 'Ensemble AUC below 85%'"
+
+      - name: Run Core & Scorer Unit Tests
+        run: |
+          python -m unittest discover -s evaluation -p "test_*.py" -v
+
+      - name: Run FastAPI Microservice Integration Tests
+        run: |
+          python -m unittest discover -s api/tests -p "test_*.py" -v
+
+      - name: Run ProofPilot Benchmark Evaluation Harness
+        run: |
+          python evaluation/evaluate.py
+          python evaluation/ragas_eval.py
