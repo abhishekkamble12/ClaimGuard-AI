@@ -10,6 +10,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+import re
 
 from utils.logging_config import get_logger
 
@@ -40,6 +41,10 @@ def log_decision(dispute_id: str, scoring_result: dict[str, Any]) -> Path:
         "weak_evidence": scoring_result.get("weak_evidence", []),
         "evidence_elements": scoring_result.get("evidence_elements", {}),
     }
+    # Validate dispute_id to prevent path traversal attacks.
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', dispute_id):
+        logger.error(f'Invalid dispute_id supplied: {dispute_id}')
+        raise ValueError('Malformed dispute_id')
     path = AUDIT_DIR / f"{dispute_id}.json"
     path.write_text(json.dumps(entry, indent=2), encoding="utf-8")
     logger.info(f"Audit trace recorded for dispute {dispute_id} -> {path}")

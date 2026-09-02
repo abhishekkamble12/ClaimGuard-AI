@@ -20,7 +20,10 @@ async def verify_razorpay_signature_dependency(
     """
     FastAPI dependency validating the X-Razorpay-Signature header against the request body.
     """
-    secret = os.getenv("WEBHOOK_SECRET", DEFAULT_WEBHOOK_SECRET)
+    secret = os.getenv("WEBHOOK_SECRET")
+    if not secret:
+        logger.critical('WEBHOOK_SECRET is missing – rejecting webhook verification')
+        raise RuntimeError('Missing WEBHOOK_SECRET environment variable')
     enforce_auth = os.getenv("ENFORCE_WEBHOOK_AUTH", "true").lower() == "true"
 
     if not x_razorpay_signature:

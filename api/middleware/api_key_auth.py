@@ -33,6 +33,8 @@ async def verify_api_key_dependency(
             )
         return x_api_key
 
-    # In development mode when no key is explicitly configured, allow pass-through
-    logger.debug("PROOFPILOT_API_KEY not configured in environment; running in open development mode.")
-    return x_api_key or "dev_open_access"
+    # If the required API key is missing we *reject* every request.
+    # This forces the deployment to fail fast rather than opening an unrestricted back‑door.
+    if not configured_key:
+        logger.error('PROOFPILOT_API_KEY is not defined – rejecting request')
+        raise HTTPException(status_code=401, detail='API key required')

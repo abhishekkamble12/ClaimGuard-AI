@@ -12,7 +12,11 @@ import json
 import os
 from typing import Any
 
-DEFAULT_WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "rzp_test_secret_proofpilot_2026")
+# In production the webhook secret must be provided via the WEBHOOK_SECRET env‑var.
+# The hard‑coded test secret is removed to avoid accidental deployment.
+DEFAULT_WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET")
+if not DEFAULT_WEBHOOK_SECRET:
+    raise RuntimeError("Missing WEBHOOK_SECRET – webhook simulator cannot run without a secret")
 
 
 def sign_webhook_payload(payload: dict[str, Any], secret: str = DEFAULT_WEBHOOK_SECRET) -> str:
