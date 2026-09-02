@@ -42,7 +42,7 @@ from ml.model_registry import get_model_registry
 from ml.win_predictor import get_win_predictor
 from monitoring.alerting import AlertManager
 from monitoring.trace import get_global_tracer
-from razorpay_integration.webhook_simulator import DEFAULT_WEBHOOK_SECRET, simulate_razorpay_dispute_event
+from razorpay_integration.webhook_simulator import simulate_razorpay_dispute_event
 from scoring.audit_log import get_audit_log
 from scoring.scorer import load_reason_code_config, score_dispute
 
@@ -182,7 +182,7 @@ with st.sidebar:
         "Simulate Razorpay Event",
         ["dispute.created", "dispute.action_required", "dispute.under_review"],
     )
-    webhook_secret = st.text_input("Webhook Secret", value=DEFAULT_WEBHOOK_SECRET, type="password")
+    webhook_secret = st.text_input("Webhook Secret", value=DEFAULT_WEBHOOK_SECRET or "", type="password")
 
     st.divider()
 

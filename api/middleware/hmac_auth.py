@@ -7,7 +7,7 @@ Defaults to STRICT verification in production environments.
 
 import os
 from fastapi import Header, HTTPException, Request
-from razorpay_integration.webhook_simulator import DEFAULT_WEBHOOK_SECRET, verify_webhook_signature
+from razorpay_integration.webhook_simulator import verify_webhook_signature
 from utils.logging_config import get_logger
 
 logger = get_logger(__name__)
