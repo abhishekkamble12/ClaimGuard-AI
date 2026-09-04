@@ -22,7 +22,7 @@ def first_case_and_config():
 
 # ── helpers shared by noise tests ─────────────────────────────────────────────
 
-def _score_cases(cases: list[dict], config: dict) -> list[dict]:
+def _score_cases(cases: list[dict], config: dict) -> list[tuple[dict, dict]]:
     """Score a list of cases, silently skipping any that raise errors."""
     results = []
     for case in cases:
@@ -272,14 +272,15 @@ class NoisySubsetCredibilityTests(unittest.TestCase):
         artificially 100%, which is exactly the inflated result the noise
         injection was meant to prevent.
         """
-        cm = _decision_cm(self.scored_noisy)
+        scored_combined = self.scored_noisy + self.scored_feat
+        cm = _decision_cm(scored_combined)
         self.assertGreater(
             cm["fp"],
             0,
             msg=(
                 f"Expected at least 1 FP in the noisy test subset but found 0. "
                 f"CM: TP={cm['tp']} FP={cm['fp']} FN={cm['fn']} TN={cm['tn']}. "
-                f"Noisy subset size: {len(self.noisy_cases)} cases. "
+                f"Noisy subset size: {len(scored_combined)} cases. "
                 "Either the noise is not reaching the scorer or the model is "
                 "always abstaining (never contesting), which games precision to 100%."
             ),
