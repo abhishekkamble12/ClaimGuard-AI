@@ -25,6 +25,7 @@ from api.routes.dataset import router as dataset_router
 from api.routes.disputes import router as disputes_router
 from api.routes.drift import router as drift_router
 from api.routes.v1_drift import router as v1_drift_router
+from api.routes.feedback import router as feedback_router
 from api.routes.health import router as health_router
 from api.routes.portfolio import router as portfolio_router
 from api.routes.webhook import router as webhook_router
