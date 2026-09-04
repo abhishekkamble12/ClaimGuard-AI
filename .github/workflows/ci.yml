@@ -40,7 +40,7 @@ jobs:
 
       - name: Train and Validate Calibrated Stacked Ensemble Model
         run: |
-          python ml/win_predictor.py
+          python -m ml.win_predictor
           python -c "import json; m=json.load(open('outputs/model_comparison.json')); assert m['models']['stacked_ensemble']['roc_auc'] >= 0.65, 'Ensemble AUC below 65%'"
 
       - name: Run Core, Security & Scorer Unit Tests

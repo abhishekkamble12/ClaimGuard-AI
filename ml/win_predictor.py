@@ -36,6 +36,12 @@ try:
 except ImportError:
     _HAS_LIGHTGBM = False
 
+import sys
+from pathlib import Path
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from ml.feature_engineering import DisputeFeatureExtractor
 from ml.model_registry import get_model_registry
 from utils.logging_config import get_logger
