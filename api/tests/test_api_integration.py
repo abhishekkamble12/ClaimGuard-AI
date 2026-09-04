@@ -129,7 +129,12 @@ class TestProofPilotAPIIntegration(unittest.TestCase):
             "dispute": self.valid_dispute_case,
             "use_ground_truth": False,
         }
-        response = self.client.post("/disputes/score", json=req_body)
+        api_key = os.getenv("PROOFPILOT_API_KEY", "proofpilot_sec_key_demo_2026")
+        response = self.client.post(
+            "/disputes/score",
+            json=req_body,
+            headers={"X-API-Key": api_key},
+        )
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["dispute_id"], "disp_integration_test_001")
@@ -138,7 +143,13 @@ class TestProofPilotAPIIntegration(unittest.TestCase):
         self.assertIn("economic_recommendation", data)
 
     def test_drift_evaluate_endpoint(self):
-        response = self.client.get("/drift/evaluate")
+        api_key = os.getenv("PROOFPILOT_API_KEY", "proofpilot_sec_key_demo_2026")
+        response = self.client.get(
+            "/api/v1/drift/evaluate",
+            headers={"X-API-Key": api_key},
+        )
+        if response.status_code == 404:
+            response = self.client.get("/drift/evaluate", headers={"X-API-Key": api_key})
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["status"], "evaluated")
