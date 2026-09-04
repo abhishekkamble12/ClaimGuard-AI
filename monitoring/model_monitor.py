@@ -98,6 +98,15 @@ class ModelDriftMonitor:
             self.recent_predictions.pop(0)
 
     def evaluate_drift(self) -> list[DriftReport]:
+        if self.baseline_features is None:
+            try:
+                from ml.win_predictor import get_win_predictor
+                p = get_win_predictor()
+                if p.X_train_arr is not None:
+                    self.set_baseline(p.X_train_arr, p.feature_names)
+            except Exception:
+                pass
+
         if self.baseline_features is None or len(self.recent_inferences) < 5:
             return []
 
@@ -130,6 +139,15 @@ class ModelDriftMonitor:
             ))
 
         return reports
+
+    def should_retrain(self, psi_threshold: float = 0.20) -> tuple[bool, list[str]]:
+        """
+        Determines whether automated model retraining is triggered based on PSI drift.
+        Returns (should_retrain: bool, drifted_features: list[str]).
+        """
+        reports = self.evaluate_drift()
+        drifted = [r.feature_name for r in reports if r.psi_score >= psi_threshold]
+        return len(drifted) > 0, drifted
 
 
 _drift_monitor_instance = None

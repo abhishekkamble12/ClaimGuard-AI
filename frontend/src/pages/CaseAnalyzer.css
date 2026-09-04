@@ -1,0 +1,44 @@
+.case-analyzer-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.case-grid-two-col {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.case-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.case-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.case-ai-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.case-xai-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (max-width: 1024px) {
+  .case-grid-two-col {
+    grid-template-columns: 1fr;
+  }
+}

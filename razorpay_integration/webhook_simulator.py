@@ -12,40 +12,50 @@ import json
 import os
 from typing import Any
 
-# In production the webhook secret must be provided via the WEBHOOK_SECRET env‑var.
-# The hard‑coded test secret is removed to avoid accidental deployment.
-DEFAULT_WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET")
-# For local testing / development, allow a deterministic fallback but warn the user.
-if DEFAULT_WEBHOOK_SECRET is None:
-    DEFAULT_WEBHOOK_SECRET = "test_secret_fallback"
-    # Note: In production you must set WEBHOOK_SECRET; this fallback is only for test environments.
+def get_webhook_secret(override_secret: str | None = None) -> str:
+    """Resolve the active Razorpay webhook secret, failing closed if unset."""
+    secret = override_secret or os.getenv("WEBHOOK_SECRET")
+    if not secret:
+        raise ValueError(
+            "WEBHOOK_SECRET environment variable is missing. "
+            "Please configure WEBHOOK_SECRET before signing or verifying Razorpay webhooks."
+        )
+    return secret
 
 
-
-def sign_webhook_payload(payload: dict[str, Any], secret: str = DEFAULT_WEBHOOK_SECRET) -> str:
+def sign_webhook_payload(payload: dict[str, Any], secret: str | None = None) -> str:
     """
     Generate authentic Razorpay HMAC-SHA256 signature for a webhook payload.
     Uses canonical compact JSON encoding matching Razorpay gateway protocol.
+    Fails closed if secret is not provided or configured.
     """
+    active_secret = get_webhook_secret(secret)
     payload_bytes = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
-    return hmac.new(secret.encode("utf-8"), payload_bytes, hashlib.sha256).hexdigest()
+    return hmac.new(active_secret.encode("utf-8"), payload_bytes, hashlib.sha256).hexdigest()
 
 
-def verify_webhook_signature(payload: dict[str, Any], signature: str, secret: str = DEFAULT_WEBHOOK_SECRET) -> bool:
+def verify_webhook_signature(payload: dict[str, Any], signature: str, secret: str | None = None) -> bool:
     """
     Verify cryptographic Razorpay HMAC-SHA256 signature against webhook payload.
     Uses constant-time comparison to prevent timing attacks.
     """
-    if not signature or not secret:
+    if not signature:
         return False
-    expected = sign_webhook_payload(payload, secret)
+    try:
+        active_secret = get_webhook_secret(secret)
+    except ValueError:
+        return False
+    expected = sign_webhook_payload(payload, active_secret)
     return hmac.compare_digest(expected, signature)
+
+
+DEFAULT_WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET")
 
 
 def simulate_razorpay_dispute_event(
     dispute_case: dict[str, Any],
     event_type: str = "dispute.created",
-    secret: str = DEFAULT_WEBHOOK_SECRET,
+    secret: str | None = None,
 ) -> dict[str, Any]:
     """
     Wrap a dispute case into an authentic Razorpay Webhook Payload structure

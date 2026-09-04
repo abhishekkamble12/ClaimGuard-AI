@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 AUDIT_DIR = Path(__file__).resolve().parent.parent / "outputs" / "audit_logs"
 
 
-def log_decision(dispute_id: str, scoring_result: dict[str, Any]) -> Path:
+def log_decision(dispute_id: str, scoring_result: dict[str, Any], dispute: dict[str, Any] | None = None) -> Path:
     """
     Log a complete decision audit trail for a dispute evaluation.
     Guarantees transparent, reproducible, and verifiable risk assessments.
@@ -28,11 +28,16 @@ def log_decision(dispute_id: str, scoring_result: dict[str, Any]) -> Path:
     entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "dispute_id": dispute_id,
+        "dispute": dispute,
         "reason_code": scoring_result.get("reason_code"),
         "reason_category": scoring_result.get("reason_category"),
         "completeness_score": scoring_result.get("completeness_score"),
         "confidence": scoring_result.get("confidence"),
         "win_probability": scoring_result.get("win_probability"),
+        "risk_score_100": scoring_result.get("risk_score_100"),
+        "risk_tier": scoring_result.get("risk_tier"),
+        "model_confidence_pct": scoring_result.get("model_confidence_pct"),
+        "executive_summary": scoring_result.get("executive_summary"),
         "routing_decision": scoring_result.get("routing_decision"),
         "risk_level": scoring_result.get("risk_level"),
         "economic_recommendation": scoring_result.get("economic_recommendation"),
@@ -40,6 +45,9 @@ def log_decision(dispute_id: str, scoring_result: dict[str, Any]) -> Path:
         "missing_evidence": scoring_result.get("missing_evidence", []),
         "weak_evidence": scoring_result.get("weak_evidence", []),
         "evidence_elements": scoring_result.get("evidence_elements", {}),
+        "gap_explanation": scoring_result.get("gap_explanation", []),
+        "local_shap_explanation": scoring_result.get("local_shap_explanation"),
+        "decision_trace": scoring_result.get("decision_trace"),
     }
     # Validate dispute_id to prevent path traversal attacks.
     if not re.fullmatch(r'[A-Za-z0-9_-]+', dispute_id):
@@ -53,6 +61,9 @@ def log_decision(dispute_id: str, scoring_result: dict[str, Any]) -> Path:
 
 def get_audit_log(dispute_id: str) -> dict[str, Any] | None:
     """Retrieve existing decision audit log for a dispute."""
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', dispute_id):
+        logger.error(f'Invalid dispute_id supplied: {dispute_id}')
+        raise ValueError('Malformed dispute_id')
     path = AUDIT_DIR / f"{dispute_id}.json"
     if path.exists():
         try:

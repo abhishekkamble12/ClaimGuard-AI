@@ -1,0 +1,41 @@
+.feedback-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+}
+
+.feedback-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border-default);
+  margin: 0 var(--space-2);
+}
+
+.feedback-toast {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent-success);
+  color: var(--text-inverse);
+  font-size: var(--text-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  animation: fadeInUp 200ms ease-out;
+}
+
+.btn-icon {
+  position: relative;
+}
+
+.feedback-active--up {
+  color: var(--accent-success) !important;
+  background: var(--accent-success-dim) !important;
+}
+
+.feedback-active--down {
+  color: var(--accent-danger) !important;
+  background: var(--accent-danger-dim) !important;
+}

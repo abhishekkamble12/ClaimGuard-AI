@@ -30,6 +30,8 @@ def generate_shap_plot(
 ) -> plt.Figure:
     """
     Generate SHAP summary feature attribution plot for the win prediction model.
+    Uses TreeExplainer (exact, model-faithful) for tree-based models (GBT, XGB, RF)
+    and falls back to LinearExplainer for logistic regression.
     Shows global average feature impact across all training disputes.
     Returns a matplotlib Figure object.
     """
@@ -38,13 +40,27 @@ def generate_shap_plot(
     try:
         import shap
 
-        explainer = shap.LinearExplainer(model, X_train)
-        shap_values = explainer.shap_values(X_train)
-
-        if isinstance(shap_values, list) and len(shap_values) == 2:
-            vals_to_plot = shap_values[1]
+        # Prefer TreeExplainer for tree-based models — exact SHAP values, not
+        # approximations. LinearExplainer on a tree ensemble gives wrong attributions.
+        if hasattr(model, "feature_importances_") or hasattr(model, "estimators_"):
+            # Tree model (GBT, RF, XGB)
+            explainer = shap.TreeExplainer(model)
+            shap_values = explainer.shap_values(X_train)
+            # XGBoost TreeExplainer can return 3D array (n_samples, n_features, n_classes)
+            if isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+                vals_to_plot = shap_values[:, :, 1]
+            elif isinstance(shap_values, list) and len(shap_values) == 2:
+                vals_to_plot = shap_values[1]
+            else:
+                vals_to_plot = shap_values
         else:
-            vals_to_plot = shap_values
+            # Logistic Regression fallback
+            explainer = shap.LinearExplainer(model, X_train)
+            shap_values = explainer.shap_values(X_train)
+            if isinstance(shap_values, list) and len(shap_values) == 2:
+                vals_to_plot = shap_values[1]
+            else:
+                vals_to_plot = shap_values
 
         plt.clf()
         shap.summary_plot(
@@ -58,7 +74,7 @@ def generate_shap_plot(
         fig = plt.gcf()
         fig.patch.set_facecolor("#ffffff")
         plt.title(
-            "SHAP Feature Impact on Dispute Win Probability (Global)",
+            "SHAP Feature Impact on Dispute Win Probability (Global — TreeSHAP)",
             fontsize=11,
             pad=12,
             fontweight="bold",
@@ -66,16 +82,25 @@ def generate_shap_plot(
     except Exception:
         plt.clf()
         fig, ax = plt.subplots(figsize=(8, 4), dpi=100)
-        coefs = np.abs(model.coef_[0])[:max_display]
-        names = feature_names[:max_display]
+        # Fallback: use feature importances for tree models, coefficients for LR
+        if hasattr(model, "feature_importances_"):
+            importances = model.feature_importances_[:max_display]
+            xlabel = "Feature Importance (Gini/Gain)"
+        elif hasattr(model, "coef_"):
+            importances = np.abs(model.coef_[0])[:max_display]
+            xlabel = "Mean |Coefficient| Contribution"
+        else:
+            importances = np.ones(min(max_display, len(feature_names)))
+            xlabel = "Feature Index"
+        names = feature_names[:len(importances)]
         y_pos = np.arange(len(names))
-        ax.barh(y_pos, coefs, align="center", color="#3b82f6", edgecolor="none")
+        ax.barh(y_pos, importances, align="center", color="#3b82f6", edgecolor="none")
         ax.set_yticks(y_pos)
         ax.set_yticklabels(names, fontsize=9)
         ax.invert_yaxis()
-        ax.set_xlabel("Mean |Coefficient| Contribution", fontsize=9)
+        ax.set_xlabel(xlabel, fontsize=9)
         ax.set_title(
-            "Feature Contribution to Win Probability (Global Coefficients)",
+            "Feature Contribution to Win Probability (Global)",
             fontsize=11,
             fontweight="bold",
         )
@@ -122,20 +147,40 @@ def explain_dispute_prediction(
     try:
         import shap
 
-        explainer = shap.LinearExplainer(model, X_train)
-        shap_values = explainer.shap_values(single_instance)
-
-        # LinearExplainer returns shape (1, n_features)
-        if isinstance(shap_values, list):
-            sv = shap_values[1][0] if len(shap_values) == 2 else shap_values[0][0]
+        # Use TreeExplainer for tree-based models (GBT, XGB, RF) — exact SHAP values.
+        # Fall back to LinearExplainer only for logistic regression.
+        if hasattr(model, "feature_importances_") or hasattr(model, "estimators_"):
+            explainer = shap.TreeExplainer(model)
+            shap_values = explainer.shap_values(single_instance)
+            ev_raw = explainer.expected_value
+            # Handle multi-class or multi-output tree explainers
+            if isinstance(shap_values, list) and len(shap_values) == 2:
+                sv = shap_values[1][0]
+                base_val = float(ev_raw[1] if hasattr(ev_raw, "__len__") else ev_raw)
+            elif isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+                sv = shap_values[0, :, 1]
+                base_val = float(ev_raw[1] if hasattr(ev_raw, "__len__") else ev_raw)
+            else:
+                sv = shap_values[0] if hasattr(shap_values, "__len__") else shap_values
+                base_val = float(ev_raw[0] if hasattr(ev_raw, "__len__") else ev_raw)
         else:
-            sv = shap_values[0]
+            # Logistic Regression
+            explainer = shap.LinearExplainer(model, X_train)
+            shap_values = explainer.shap_values(single_instance)
+            if isinstance(shap_values, list):
+                sv = shap_values[1][0] if len(shap_values) == 2 else shap_values[0][0]
+            else:
+                sv = shap_values[0]
+            ev_raw = explainer.expected_value
+            base_val = float(ev_raw[1] if hasattr(ev_raw, "__len__") and len(ev_raw) > 1 else ev_raw)
+
+        # Convert log-odds base_value to probability space if needed
+        if base_val > 1.0 or base_val < 0.0:
+            base_val = 1.0 / (1.0 + np.exp(-base_val))
 
         explanation = shap.Explanation(
-            values=sv,
-            base_values=explainer.expected_value if np.isscalar(explainer.expected_value)
-                        else explainer.expected_value[1] if len(explainer.expected_value) == 2
-                        else explainer.expected_value[0],
+            values=sv if isinstance(sv, np.ndarray) else np.array(sv),
+            base_values=base_val,
             data=single_instance[0],
             feature_names=feature_names,
         )
@@ -146,7 +191,7 @@ def explain_dispute_prediction(
         fig.set_size_inches(8, 4.5)
         fig.patch.set_facecolor("#ffffff")
         fig.suptitle(
-            f"Local XAI — Why P(Win) = {predicted_prob:.0%} for This Dispute",
+            f"Local XAI (TreeSHAP) — Why P(Win) = {predicted_prob:.0%} for This Dispute",
             fontsize=11,
             fontweight="bold",
             y=1.02,
@@ -156,7 +201,14 @@ def explain_dispute_prediction(
 
     except Exception:
         # ── Fallback: manual signed contribution bar chart ──
-        contributions = model.coef_[0] * single_instance[0]
+        if hasattr(model, "feature_importances_"):
+            # Tree model — use feature importances scaled by feature value sign
+            importances = model.feature_importances_
+            contributions = importances * np.sign(single_instance[0])
+        elif hasattr(model, "coef_"):
+            contributions = model.coef_[0] * single_instance[0]
+        else:
+            contributions = np.zeros(len(feature_names))
 
         # Sort by absolute contribution magnitude, take top max_display
         sorted_idx = np.argsort(np.abs(contributions))[::-1][:max_display]
@@ -171,7 +223,7 @@ def explain_dispute_prediction(
         ax.set_yticklabels(sorted_names, fontsize=9)
         ax.invert_yaxis()
         ax.axvline(x=0, color="#374151", linewidth=1.0, linestyle="-")
-        ax.set_xlabel("Feature Contribution to P(Win) (Weight × Value)", fontsize=9)
+        ax.set_xlabel("Feature Contribution to P(Win)", fontsize=9)
         ax.set_title(
             f"Local XAI — P(Win) = {predicted_prob:.0%} | Why This Dispute Scored This Way",
             fontsize=11,
@@ -284,17 +336,17 @@ def build_evidence_contribution_chart(
             ax.text(contrib - 0.008, y_pos[i], f"{contrib:.0%}",
                     va="center", ha="right", fontsize=8, color="#ffffff", fontweight="bold", zorder=5)
         if status == "missing":
-            ax.text(potential + 0.01, y_pos[i], "Missing ❌",
+            ax.text(potential + 0.01, y_pos[i], "Missing [0%]",
                     va="center", ha="left", fontsize=8, color="#9ca3af", zorder=5)
         elif status == "weak":
-            ax.text(contrib + 0.01, y_pos[i], f"Weak ⚠️ (+{potential - contrib:.0%} possible)",
+            ax.text(contrib + 0.01, y_pos[i], f"Weak (+{potential - contrib:.0%} possible)",
                     va="center", ha="left", fontsize=8, color="#d97706", zorder=5)
 
     # Legend
     legend_patches = [
-        mpatches.Patch(color="#22c55e", edgecolor="#16a34a", label="Present ✅ (full contribution)"),
-        mpatches.Patch(color="#f59e0b", edgecolor="#d97706", label="Weak ⚠️ (partial contribution)"),
-        mpatches.Patch(color="#e5e7eb", edgecolor="#9ca3af", linestyle="--", label="Missing ❌ (zero — potential shown)"),
+        mpatches.Patch(facecolor="#22c55e", edgecolor="#16a34a", label="Present (full contribution)"),
+        mpatches.Patch(facecolor="#f59e0b", edgecolor="#d97706", label="Weak (partial contribution)"),
+        mpatches.Patch(facecolor="#e5e7eb", edgecolor="#9ca3af", linestyle="--", label="Missing (zero — potential shown)"),
     ]
     ax.legend(handles=legend_patches, fontsize=8, loc="lower right")
 

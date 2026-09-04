@@ -61,6 +61,12 @@ class DisputeScoringResponse(BaseModel):
     ml_model_auc: float
     ml_feature_importances: dict[str, float]
     decision_trace: list[dict[str, Any]]
+    risk_score_100: int | None = None
+    risk_tier: str | None = None
+    model_confidence_pct: int | None = None
+    executive_summary: str | None = None
+    local_shap_explanation: dict[str, Any] | None = None
+    inference_latency_ms: float | None = None
 
 
 class BatchScoreRequest(BaseModel):

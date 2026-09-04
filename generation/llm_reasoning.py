@@ -490,7 +490,7 @@ Readiness Score: {score_pct} | Confidence: {conf_pct}
 ML Win Probability P(Win): {pwin_pct} | Expected ROI (EV): ₹{ev:,.2f}
 Routing Decision: {routing} | Risk Tier: {risk} | Economic Action: {action}
 Evidence State: {framed_gaps}
-Top Recommended Action: {top_gap["explanation"] if top_gap else "N/A"}
+Top Recommended Action: {f"Upload {top_gap['evidence_id'].replace('_', ' ').title()} (+{top_gap.get('potential_score_gain', 0):.0%} potential score gain)" if top_gap else "N/A"}
 
 Format as 5-6 bullet points (no headings). Each bullet: **Label**: explanation.
 """

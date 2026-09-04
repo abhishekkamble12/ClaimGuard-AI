@@ -1,0 +1,51 @@
+.evidence-table-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--bg-secondary);
+}
+
+.evidence-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.evidence-table-header h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.evidence-table-scroll {
+  overflow-x: auto;
+}
+
+.evidence-table {
+  width: 100%;
+}
+
+.evidence-name-cell {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.tfidf-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tfidf-bar-bg {
+  width: 50px;
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.tfidf-bar-fill {
+  height: 100%;
+  background: var(--accent-info);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-base) ease;
+}

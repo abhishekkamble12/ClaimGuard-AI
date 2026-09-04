@@ -224,3 +224,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node / JS / Web
+node_modules/
+**/node_modules/
+package-lock.json
+
+# Project specific dynamic output & scratch
+outputs/audit_logs/
+scratch/
+powershell.cmd
+

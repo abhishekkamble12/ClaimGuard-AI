@@ -1,0 +1,10 @@
+{
+  "duplicate_charge": 0.25,
+  "upi_fraudulent_collect": 0.21,
+  "product_not_as_described": 0.26,
+  "goods_not_received": 0.16,
+  "upi_autopay_goods_not_received": 0.2,
+  "unauthorized_fraud": 0.19,
+  "upi_credit_failed": 0.28,
+  "refund_not_processed": 0.25
+}

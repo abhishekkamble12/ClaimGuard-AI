@@ -12,10 +12,21 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
+# Load .env before any module reads os.getenv() — must be first import
+from pathlib import Path as _Path
+try:
+    from dotenv import load_dotenv as _load_dotenv
+    _load_dotenv(_Path(__file__).resolve().parent.parent / ".env", override=False)
+except ImportError:
+    pass  # python-dotenv optional; use real env vars in production
+
 from api.dependencies import get_active_predictor, get_all_reason_codes
+from api.routes.dataset import router as dataset_router
 from api.routes.disputes import router as disputes_router
 from api.routes.drift import router as drift_router
+from api.routes.v1_drift import router as v1_drift_router
 from api.routes.health import router as health_router
+from api.routes.portfolio import router as portfolio_router
 from api.routes.webhook import router as webhook_router
 from utils.logging_config import get_logger, setup_logging
 
@@ -67,11 +78,16 @@ class SecurityAndTracingMiddleware(BaseHTTPMiddleware):
 
 # Middleware registration
 app.add_middleware(SecurityAndTracingMiddleware)
+import os
+
+allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000,http://localhost:8501")
+allowed_origins = [o.strip() for o in allowed_origins_raw.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=allowed_origins if allowed_origins else ["*"],
+    allow_credentials=True if allowed_origins != ["*"] else False,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -79,7 +95,10 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(webhook_router)
 app.include_router(disputes_router)
-app.include_router(drift_router)
+app.include_router(dataset_router)
+app.include_router(portfolio_router)
+app.include_router(v1_drift_router)
+app.include_router(feedback_router)
 
 
 if __name__ == "__main__":

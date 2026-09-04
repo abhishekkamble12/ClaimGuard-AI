@@ -1,0 +1,95 @@
+.economic-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.economic-card--contest {
+  border-left: 4px solid var(--accent-success);
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.04), var(--bg-secondary));
+}
+
+.economic-card--accept {
+  border-left: 4px solid var(--accent-warning);
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.04), var(--bg-secondary));
+}
+
+.economic-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.economic-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+}
+
+.economic-title h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.economic-action-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+.badge-contest {
+  background: var(--accent-success-dim);
+  color: var(--accent-success);
+}
+
+.badge-accept {
+  background: var(--accent-warning-dim);
+  color: var(--accent-warning);
+}
+
+.economic-reason {
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  color: var(--text-secondary);
+}
+
+.economic-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  background: var(--bg-surface);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.economic-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.economic-metric-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.economic-metric-val {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.economic-fee-callout {
+  font-size: var(--text-xs);
+  color: var(--accent-warning);
+  background: var(--accent-warning-dim);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}

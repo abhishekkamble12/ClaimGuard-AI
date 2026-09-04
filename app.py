@@ -182,7 +182,13 @@ with st.sidebar:
         "Simulate Razorpay Event",
         ["dispute.created", "dispute.action_required", "dispute.under_review"],
     )
-    webhook_secret = st.text_input("Webhook Secret", value=DEFAULT_WEBHOOK_SECRET or "", type="password")
+    webhook_secret = st.text_input(
+        "Webhook Secret",
+        value="",
+        type="password",
+        help="Provide your Razorpay Webhook Secret or configure the WEBHOOK_SECRET environment variable.",
+        placeholder="Enter secret or set WEBHOOK_SECRET...",
+    )
 
     st.divider()
 
@@ -443,10 +449,12 @@ with tab_analyzer:
                 "for **this specific dispute**."
             )
             if local_shap and predictor.is_trained and predictor.X_train_arr is not None:
+                inst = np.array([local_shap["feature_vector"]]) if "feature_vector" in local_shap else local_shap.get("instance")
+                mdl = predictor.raw_models.get("xgb") or predictor.raw_models.get("gbt") or predictor.model
                 local_fig = explain_dispute_prediction(
-                    model=local_shap["model"],
-                    X_train=local_shap["x_train"],
-                    single_instance=local_shap["instance"],
+                    model=mdl,
+                    X_train=predictor.X_train_arr,
+                    single_instance=inst,
                     feature_names=local_shap["feature_names"],
                     base_prob=local_shap["base_value"],
                     predicted_prob=local_shap["predicted_prob"],

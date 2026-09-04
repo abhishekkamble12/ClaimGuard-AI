@@ -1,0 +1,50 @@
+.metric-strip {
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Deadline urgency banner ─────────────────────────────────────────────── */
+.deadline-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  margin-bottom: var(--space-3);
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+}
+
+.deadline-badge__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.deadline-badge__text {
+  line-height: 1.4;
+}
+
+/* Variants */
+.deadline-badge--danger {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.deadline-badge--warning {
+  background: #fffbeb;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.deadline-badge--success {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #14532d;
+}
+
+.deadline-badge--info {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1e3a5f;
+}

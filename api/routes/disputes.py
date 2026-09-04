@@ -9,6 +9,7 @@ Provides endpoints for:
 """
 
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -76,6 +77,7 @@ def score_single_dispute(
     """
     case_dict = request.dispute.model_dump()
     try:
+        start_time = time.perf_counter()
         result = score_dispute(
             dispute=case_dict,
             reason_codes=reason_codes,
@@ -83,6 +85,8 @@ def score_single_dispute(
             api_key=request.api_key,
             log_audit=True,
         )
+        latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+        result["inference_latency_ms"] = latency_ms
         return result
     except ValueError as val_err:
         raise HTTPException(status_code=400, detail=str(val_err))
@@ -205,3 +209,49 @@ def get_dispute_audit_trace(dispute_id: str) -> dict[str, Any]:
     if not audit_entry:
         raise HTTPException(status_code=404, detail=f"No audit trace found for dispute {dispute_id}")
     return audit_entry
+
+
+@router.get("/{dispute_id}/explain")
+@router.post("/explain/{dispute_id}")
+def explain_dispute_endpoint(
+    dispute_id: str,
+    reason_codes: dict[str, Any] = Depends(get_all_reason_codes),
+) -> dict[str, Any]:
+    """
+    Retrieve feature attribution explanation, SHAP local waterfall values,
+    risk score breakdown, and executive summary for a specific dispute.
+    """
+    audit_entry = get_audit_log(dispute_id)
+    if audit_entry and audit_entry.get("local_shap_explanation"):
+        return {
+            "dispute_id": dispute_id,
+            "win_probability": audit_entry.get("win_probability"),
+            "win_probability_pct": f"{audit_entry.get('win_probability', 0.0):.0%}",
+            "risk_score_100": audit_entry.get("risk_score_100"),
+            "risk_tier": audit_entry.get("risk_tier"),
+            "model_confidence_pct": audit_entry.get("model_confidence_pct", 80),
+            "executive_summary": audit_entry.get("executive_summary"),
+            "local_shap_explanation": audit_entry.get("local_shap_explanation"),
+            "decision_trace": audit_entry.get("decision_trace"),
+            "economic_recommendation": audit_entry.get("economic_recommendation"),
+            "gap_explanation": audit_entry.get("gap_explanation", []),
+        }
+
+    case_dict = _find_dispute_case(dispute_id)
+    if not case_dict:
+        raise HTTPException(status_code=404, detail=f"Dispute '{dispute_id}' not found.")
+
+    res = score_dispute(case_dict, reason_codes, log_audit=False)
+    return {
+        "dispute_id": dispute_id,
+        "win_probability": res.get("win_probability"),
+        "win_probability_pct": res.get("win_probability_pct"),
+        "risk_score_100": res.get("risk_score_100"),
+        "risk_tier": res.get("risk_tier"),
+        "model_confidence_pct": res.get("model_confidence_pct"),
+        "executive_summary": res.get("executive_summary"),
+        "local_shap_explanation": res.get("local_shap_explanation"),
+        "decision_trace": res.get("decision_trace"),
+        "economic_recommendation": res.get("economic_recommendation"),
+        "gap_explanation": res.get("gap_explanation"),
+    }

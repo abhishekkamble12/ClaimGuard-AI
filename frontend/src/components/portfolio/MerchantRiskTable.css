@@ -1,0 +1,54 @@
+.merchant-table-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--bg-secondary);
+}
+
+.merchant-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.merchant-table-header h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.merchant-table-scroll {
+  overflow-x: auto;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
+}
+
+.cursor-pointer:hover {
+  color: var(--accent-primary);
+}
+
+.vamp-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.vamp-healthy {
+  background: var(--accent-success-dim);
+  color: var(--accent-success);
+}
+
+.vamp-warning {
+  background: var(--accent-warning-dim);
+  color: var(--accent-warning);
+}
+
+.vamp-penalty {
+  background: var(--accent-danger-dim);
+  color: var(--accent-danger);
+  animation: pulseGlow 2s infinite;
+}

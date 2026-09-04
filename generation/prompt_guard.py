@@ -59,7 +59,7 @@ class PromptGuard:
         # System prompt revelation / extraction
         (
             "system_prompt_leak",
-            r"(?i)\b(repeat|print|output|display|show|reveal|echo|tell\s+me|expose)\b\s+(the\s+)?(system\s+prompt|initial\s+instructions?|hidden\s+prompt|developer\s+mode\s+prompt|secret\s+key|confidential\s+rules)",
+            r"(?i)\b(repeat|print|output|display|show|reveal|echo|tell\s+me|expose)\b\s+(the\s+)?((initial\s+)?(system\s+prompt|instructions?|hidden\s+prompt|developer\s+mode\s+prompt)|secret\s+key|confidential\s+rules|secret\s+developer\s+rules?)",
             0.90,
         ),
         # Roleplay / Jailbreak personas (DAN, Developer Mode, AIM, etc.)

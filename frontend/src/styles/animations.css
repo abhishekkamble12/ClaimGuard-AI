@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════════════════════════
+   ProofPilot Micro-Animations
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Count-up number animation ──────────────────────────────── */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Fade in up (page/card entrance) ────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Fade in (generic) ──────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Scale bounce (badge/status change) ─────────────────────── */
+@keyframes scaleBounce {
+  0%   { transform: scale(0.8); opacity: 0; }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Slide in from left (SHAP bars) ─────────────────────────── */
+@keyframes slideInLeft {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+/* ── Pulse glow (active/live indicators) ────────────────────── */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 4px var(--accent-primary-glow); }
+  50%      { box-shadow: 0 0 16px var(--accent-primary-glow); }
+}
+
+/* ── Typing cursor blink (streaming response) ───────────────── */
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ── Shimmer loading skeleton ───────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* ── Spin (loading spinner) ─────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Step reveal (decision trace sequential) ────────────────── */
+@keyframes stepReveal {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Color morph (risk level transition) ────────────────────── */
+@keyframes colorMorph {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+/* ── Utility animation classes ──────────────────────────────── */
+.animate-fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-out) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-base) ease-out both;
+}
+
+.animate-scale-bounce {
+  animation: scaleBounce 400ms var(--ease-spring) both;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft var(--duration-slow) var(--ease-out) both;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--bg-elevated) 50%,
+    var(--bg-surface) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ── Stagger delays for list items ──────────────────────────── */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+.stagger-7 { animation-delay: 350ms; }
+.stagger-8 { animation-delay: 400ms; }

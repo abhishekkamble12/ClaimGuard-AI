@@ -1,33 +1,356 @@
 {
   "dataset": "D:\\ClaimGuard-AI\\outputs\\synthetic_chargeback_dataset.json",
-  "split": "test",
-  "total_cases": 19,
-  "route_accuracy": 0.8947,
-  "evidence_detection_precision": 1.0,
-  "evidence_detection_recall": 1.0,
-  "false_positive_auto_drafts": 1,
-  "false_positive_auto_draft_rate": 0.1667,
-  "false_positive_cost_per_case_inr": 4735.84,
-  "total_false_positive_financial_cost_inr": 4735.84,
-  "abstention_rate": 0.2632,
-  "predicted_routes": {
-    "auto_draft_response": 6,
-    "request_more_evidence": 8,
-    "human_review": 5
+  "split_evaluated": "test",
+  "split_label": "TEST",
+  "total_cases_in_split": 400,
+  "clean_cases_in_split": 177,
+  "noisy_adversarial_cases_in_split": 223,
+  "successfully_scored": 400,
+  "task_1_evidence_extraction": {
+    "all_cases": {
+      "precision": 1.0,
+      "recall": 0.8799,
+      "f1": 0.9361
+    },
+    "clean_cases_subset": {
+      "count": 177,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "noisy_adversarial_subset": {
+      "count": 223,
+      "precision": 1.0,
+      "recall": 0.7791,
+      "f1": 0.8758
+    },
+    "confusion_matrix_all": {
+      "tp": 1267,
+      "fp": 0,
+      "fn": 173,
+      "tn": 560
+    }
   },
-  "expected_routes": {
-    "request_more_evidence": 8,
-    "human_review": 6,
-    "auto_draft_response": 5
+  "task_2_dispute_decision": {
+    "precision": 0.4554,
+    "precision_wilson_ci": {
+      "low": 0.3617,
+      "high": 0.5524,
+      "margin": 0.097
+    },
+    "recall": 0.374,
+    "recall_wilson_ci": {
+      "low": 0.2935,
+      "high": 0.4621,
+      "margin": 0.0881
+    },
+    "f1": 0.4107,
+    "accuracy": 0.67,
+    "expected_calibration_error": 0.098,
+    "optimal_decision_threshold": 0.1235,
+    "min_precision_threshold": 0.3067,
+    "profit_optimal_threshold": 0.05,
+    "threshold_selection_method": "EV maximisation on 80/20 train/validation split (PR-curve search)",
+    "ml_roc_auc": 0.6711,
+    "ml_pr_auc": 0.4463,
+    "ml_brier_score": 0.1979,
+    "total_expected_cost_inr": 389523.0,
+    "mcnemar_test_vs_naive": {
+      "b_pp_better_than_naive": 222,
+      "c_naive_better_than_pp": 77,
+      "chi2_stat": 69.3512,
+      "p_value": 0.0,
+      "is_statistically_significant": true
+    },
+    "confusion_matrix": {
+      "TP_contest_and_won": 46,
+      "FP_contest_and_lost": 55,
+      "FN_accept_and_won": 77,
+      "TN_accept_and_lost": 222
+    },
+    "routing_distribution": {
+      "route_accuracy": 0.7925,
+      "abstention_rate": 0.4225,
+      "predicted": {
+        "request_more_evidence": 126,
+        "auto_draft_response": 105,
+        "human_review": 169
+      },
+      "expected": {
+        "request_more_evidence": 148,
+        "human_review": 151,
+        "auto_draft_response": 101
+      }
+    }
   },
-  "expected_outcomes": {
-    "won": 7,
-    "lost": 12
+  "task_3_financial_ledger": {
+    "gross_amount_recovered_inr": 950454.0,
+    "fp_wasted_fees_inr": 27500.0,
+    "fn_forfeited_opportunity_inr": 362023.0,
+    "tn_saved_penalty_fees_inr": 111000.0,
+    "net_ledger_impact_inr": 560931.0,
+    "proofpilot_total_ev_inr": 922954.0,
+    "naive_always_contest_ev_inr": 1173977.0,
+    "naive_always_accept_ev_inr": 0.0,
+    "net_ev_gain_vs_always_contest_inr": -251023.0,
+    "net_ev_gain_vs_always_accept_inr": 922954.0
   },
-  "evidence_confusion": {
-    "true_positive": 71,
-    "false_positive": 0,
-    "false_negative": 0,
-    "true_negative": 24
-  }
+  "decision_metrics_by_category": {
+    "duplicate_charge": {
+      "total_cases": 50,
+      "win_rate": 0.42,
+      "precision": 0.6111,
+      "recall": 0.5238,
+      "f1": 0.5641,
+      "confusion_matrix": {
+        "tp": 11,
+        "fp": 7,
+        "fn": 10,
+        "tn": 22
+      },
+      "fp_cost_inr": 3500.0,
+      "fn_cost_inr": 36590.0
+    },
+    "goods_not_received": {
+      "total_cases": 50,
+      "win_rate": 0.26,
+      "precision": 0.3077,
+      "recall": 0.3077,
+      "f1": 0.3077,
+      "confusion_matrix": {
+        "tp": 4,
+        "fp": 9,
+        "fn": 9,
+        "tn": 28
+      },
+      "fp_cost_inr": 4500.0,
+      "fn_cost_inr": 28291.0
+    },
+    "product_not_as_described": {
+      "total_cases": 50,
+      "win_rate": 0.44,
+      "precision": 0.5,
+      "recall": 0.3182,
+      "f1": 0.3889,
+      "confusion_matrix": {
+        "tp": 7,
+        "fp": 7,
+        "fn": 15,
+        "tn": 21
+      },
+      "fp_cost_inr": 3500.0,
+      "fn_cost_inr": 70185.0
+    },
+    "refund_not_processed": {
+      "total_cases": 50,
+      "win_rate": 0.28,
+      "precision": 0.6,
+      "recall": 0.6429,
+      "f1": 0.6207,
+      "confusion_matrix": {
+        "tp": 9,
+        "fp": 6,
+        "fn": 5,
+        "tn": 30
+      },
+      "fp_cost_inr": 3000.0,
+      "fn_cost_inr": 58995.0
+    },
+    "unauthorized_fraud": {
+      "total_cases": 50,
+      "win_rate": 0.2,
+      "precision": 0.2308,
+      "recall": 0.3,
+      "f1": 0.2609,
+      "confusion_matrix": {
+        "tp": 3,
+        "fp": 10,
+        "fn": 7,
+        "tn": 30
+      },
+      "fp_cost_inr": 5000.0,
+      "fn_cost_inr": 23793.0
+    },
+    "upi_autopay_goods_not_received": {
+      "total_cases": 50,
+      "win_rate": 0.3,
+      "precision": 0.4545,
+      "recall": 0.3333,
+      "f1": 0.3846,
+      "confusion_matrix": {
+        "tp": 5,
+        "fp": 6,
+        "fn": 10,
+        "tn": 29
+      },
+      "fp_cost_inr": 3000.0,
+      "fn_cost_inr": 44590.0
+    },
+    "upi_credit_failed": {
+      "total_cases": 50,
+      "win_rate": 0.34,
+      "precision": 0.6,
+      "recall": 0.3529,
+      "f1": 0.4444,
+      "confusion_matrix": {
+        "tp": 6,
+        "fp": 4,
+        "fn": 11,
+        "tn": 29
+      },
+      "fp_cost_inr": 2000.0,
+      "fn_cost_inr": 52489.0
+    },
+    "upi_fraudulent_collect": {
+      "total_cases": 50,
+      "win_rate": 0.22,
+      "precision": 0.1429,
+      "recall": 0.0909,
+      "f1": 0.1111,
+      "confusion_matrix": {
+        "tp": 1,
+        "fp": 6,
+        "fn": 10,
+        "tn": 33
+      },
+      "fp_cost_inr": 3000.0,
+      "fn_cost_inr": 47090.0
+    }
+  },
+  "ablation_table": {
+    "lr": {
+      "roc_auc": 0.6696,
+      "brier_score": 0.1989,
+      "precision": 0.3352,
+      "recall": 0.9512
+    },
+    "gbt": {
+      "roc_auc": 0.662,
+      "brier_score": 0.2,
+      "precision": 0.3112,
+      "recall": 0.9919
+    },
+    "rf": {
+      "roc_auc": 0.6715,
+      "brier_score": 0.1979,
+      "precision": 0.3119,
+      "recall": 0.9837
+    },
+    "stacked_ensemble": {
+      "roc_auc": 0.6711,
+      "brier_score": 0.1979,
+      "precision": 0.3183,
+      "recall": 0.9756
+    }
+  },
+  "threshold_sensitivity_table": [
+    {
+      "threshold": 0.2,
+      "precision": 0.4646,
+      "recall": 0.374,
+      "f1": 0.4144,
+      "tp": 46,
+      "fp": 53,
+      "fn": 77,
+      "tn": 224,
+      "contested": 99,
+      "net_ev_inr": 923954.0
+    },
+    {
+      "threshold": 0.25,
+      "precision": 0.4639,
+      "recall": 0.3659,
+      "f1": 0.4091,
+      "tp": 45,
+      "fp": 52,
+      "fn": 78,
+      "tn": 225,
+      "contested": 97,
+      "net_ev_inr": 920955.0
+    },
+    {
+      "threshold": 0.3,
+      "precision": 0.4639,
+      "recall": 0.3659,
+      "f1": 0.4091,
+      "tp": 45,
+      "fp": 52,
+      "fn": 78,
+      "tn": 225,
+      "contested": 97,
+      "net_ev_inr": 920955.0
+    },
+    {
+      "threshold": 0.35,
+      "precision": 0.4639,
+      "recall": 0.3659,
+      "f1": 0.4091,
+      "tp": 45,
+      "fp": 52,
+      "fn": 78,
+      "tn": 225,
+      "contested": 97,
+      "net_ev_inr": 920955.0
+    },
+    {
+      "threshold": 0.4,
+      "precision": 0.4639,
+      "recall": 0.3659,
+      "f1": 0.4091,
+      "tp": 45,
+      "fp": 52,
+      "fn": 78,
+      "tn": 225,
+      "contested": 97,
+      "net_ev_inr": 920955.0
+    },
+    {
+      "threshold": 0.45,
+      "precision": 0.4639,
+      "recall": 0.3659,
+      "f1": 0.4091,
+      "tp": 45,
+      "fp": 52,
+      "fn": 78,
+      "tn": 225,
+      "contested": 97,
+      "net_ev_inr": 920955.0
+    },
+    {
+      "threshold": 0.5,
+      "precision": 0.4468,
+      "recall": 0.3415,
+      "f1": 0.3871,
+      "tp": 42,
+      "fp": 52,
+      "fn": 81,
+      "tn": 225,
+      "contested": 94,
+      "net_ev_inr": 917958.0
+    },
+    {
+      "threshold": 0.55,
+      "precision": 0.4468,
+      "recall": 0.3415,
+      "f1": 0.3871,
+      "tp": 42,
+      "fp": 52,
+      "fn": 81,
+      "tn": 225,
+      "contested": 94,
+      "net_ev_inr": 917958.0
+    },
+    {
+      "threshold": 0.6,
+      "precision": 0.4468,
+      "recall": 0.3415,
+      "f1": 0.3871,
+      "tp": 42,
+      "fp": 52,
+      "fn": 81,
+      "tn": 225,
+      "contested": 94,
+      "net_ev_inr": 917958.0
+    }
+  ]
 }

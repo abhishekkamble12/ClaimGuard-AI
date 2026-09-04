@@ -15,7 +15,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import yaml
+try:
+    import yaml
+    _HAS_YAML = True
+except ImportError:
+    _HAS_YAML = False
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -54,7 +58,7 @@ def load_scoring_thresholds_config(config_path: Path = THRESHOLDS_CONFIG_PATH) -
             "min_contest_win_probability": 0.50,
         },
     }
-    if config_path.exists():
+    if _HAS_YAML and config_path.exists():
         try:
             loaded = yaml.safe_load(config_path.read_text(encoding="utf-8"))
             if isinstance(loaded, dict):
@@ -103,9 +107,10 @@ def score_evidence(
     total_score = 0.0
 
     for evidence_id, weight in required_evidence.items():
+        weight_val = float(weight.get("weight", 0.0)) if isinstance(weight, dict) else weight
         status = evidence_statuses.get(evidence_id, "missing")
         raw_score = STATUS_SCORE.get(status, 0.0)
-        weighted = weight * raw_score
+        weighted = weight_val * raw_score
         total_score += weighted
 
         # Calculate TF-IDF semantic relevance if documents and config description available
@@ -113,13 +118,13 @@ def score_evidence(
         if evidence_documents and rc_config_required and evidence_id in evidence_documents:
             doc_text = evidence_documents.get(evidence_id, "")
             req_spec = rc_config_required.get(evidence_id, {})
-            desc_text = req_spec.get("description", "") if isinstance(req_spec, dict) else str(evidence_id)
+            desc_text = req_spec.get("description", "") if isinstance(req_spec, dict) else evidence_id
             if doc_text and desc_text:
                 semantic_sim = compute_semantic_relevance(doc_text, desc_text)
 
         elements[evidence_id] = {
             "status": status,
-            "weight": weight,
+            "weight": weight_val,
             "score": raw_score,
             "weighted_contribution": round(weighted, 4),
             "semantic_relevance": semantic_sim,
@@ -211,6 +216,10 @@ def build_counterfactual_improvements(
 
     # Sort by highest potential score gain first
     return sorted(gaps, key=lambda x: x["potential_score_gain"], reverse=True)
+
+
+# Backward-compatibility alias
+compute_counterfactual_improvements = build_counterfactual_improvements
 
 
 def build_decision_trace(
@@ -361,7 +370,12 @@ def score_dispute(
     win_probability = win_predictor.predict_win_probability(dispute, partial_result)
     disputed_amount = float(dispute.get("transaction", {}).get("amount", 1000))
     expected_value = win_predictor.calculate_expected_financial_value(disputed_amount, win_probability)
-    economic_rec = win_predictor.recommend_action(disputed_amount, win_probability)
+    economic_rec = win_predictor.recommend_action(
+        disputed_amount,
+        win_probability,
+        category=category,
+        dispute=dispute,
+    )
 
     # Real-time inference logging to ModelDriftMonitor
     try:
@@ -387,6 +401,33 @@ def score_dispute(
     # Phase 1 XAI — Local SHAP explanation for current dispute
     local_shap = win_predictor.get_local_shap_explanation(dispute, partial_result)
 
+    # Phase 5: Risk Score (0-100), Tiering & Human-Readable Explanation
+    risk_score_100 = round(win_probability * 100)
+    if risk_score_100 >= 65:
+        calibrated_risk_tier = "LOW"  # High win probability = Low loss risk
+    elif risk_score_100 >= 35:
+        calibrated_risk_tier = "MEDIUM"
+    else:
+        calibrated_risk_tier = "HIGH"  # Low win probability = High loss risk
+
+    # Model confidence represents distance from ambiguous decision boundary (0.50)
+    model_certainty_pct = round((abs(win_probability - 0.5) * 2) * 100)
+
+    # Human-readable executive summary of top drivers
+    top_drivers_text = ""
+    if local_shap and "feature_names" in local_shap and "shap_values" in local_shap:
+        f_names = local_shap["feature_names"]
+        s_vals = local_shap["shap_values"]
+        paired = sorted(zip(s_vals, f_names), key=lambda x: abs(x[0]), reverse=True)[:3]
+        top_drivers_text = "; ".join(f"{name} ({'+' if val >= 0 else ''}{val:.2f})" for val, name in paired)
+
+    win_prob_pct = f"{win_probability:.0%}"
+    exec_summary = (
+        f"Dispute Win Probability is {win_prob_pct} (Readiness Score: {risk_score_100}/100, "
+        f"Assigned Risk Tier: {calibrated_risk_tier}). Recommended action: {economic_rec.get('action')}. "
+        + (f"Key attribution drivers: {top_drivers_text}." if top_drivers_text else "")
+    )
+
     result = {
         "dispute_id": dispute.get("dispute_id", "unknown"),
         "merchant_name": dispute.get("merchant_name", "Merchant"),
@@ -400,6 +441,10 @@ def score_dispute(
         "confidence": confidence,
         "confidence_pct": f"{confidence:.0%}",
         "risk_level": risk_level,
+        "risk_score_100": risk_score_100,
+        "risk_tier": calibrated_risk_tier,
+        "model_confidence_pct": model_certainty_pct,
+        "executive_summary": exec_summary,
         "routing_decision": routing_decision,
         "missing_evidence": missing_evidence,
         "weak_evidence": weak_evidence,
@@ -417,11 +462,15 @@ def score_dispute(
 
     if log_audit:
         try:
-            log_decision(dispute.get("dispute_id", "unknown"), result)
+            log_decision(dispute.get("dispute_id", "unknown"), result, dispute=dispute)
         except Exception as exc:
             logger.warning(f"Failed to log decision audit trace: {exc}")
 
     return result
+
+
+# Backward-compatibility alias
+score_single_dispute = score_dispute
 
 
 def score_dataset(

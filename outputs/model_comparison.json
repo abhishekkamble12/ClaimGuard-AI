@@ -1,35 +1,39 @@
 {
-  "dataset_size": 60,
-  "train_count": 41,
-  "test_count": 19,
+  "dataset_size": 2000,
+  "train_count": 1280,
+  "test_count": 400,
   "models": {
     "lr": {
-      "roc_auc": 0.7976,
-      "brier_score": 0.1756,
-      "precision": 0.625,
-      "recall": 0.7143
+      "roc_auc": 0.6696,
+      "brier_score": 0.1989,
+      "precision": 0.3352,
+      "recall": 0.9512,
+      "threshold_used": 0.1235
     },
     "gbt": {
-      "roc_auc": 0.8095,
-      "brier_score": 0.1987,
-      "precision": 0.5714,
-      "recall": 0.5714
+      "roc_auc": 0.662,
+      "brier_score": 0.2,
+      "precision": 0.3112,
+      "recall": 0.9919,
+      "threshold_used": 0.1235
     },
     "rf": {
-      "roc_auc": 0.8095,
-      "brier_score": 0.1574,
-      "precision": 0.75,
-      "recall": 0.4286
+      "roc_auc": 0.6715,
+      "brier_score": 0.1979,
+      "precision": 0.3119,
+      "recall": 0.9837,
+      "threshold_used": 0.1235
     },
     "stacked_ensemble": {
-      "roc_auc": 0.8214,
-      "brier_score": 0.1556,
-      "precision": 0.6667,
-      "recall": 0.5714,
+      "roc_auc": 0.6711,
+      "brier_score": 0.1979,
+      "precision": 0.3183,
+      "recall": 0.9756,
+      "threshold_used": 0.1235,
       "weights": {
-        "gbt": 0.5,
-        "lr": 0.3,
-        "rf": 0.2
+        "lr": 0.3092,
+        "gbt": 0.3666,
+        "rf": 0.3242
       }
     }
   },

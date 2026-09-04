@@ -1,0 +1,96 @@
+.decision-trace-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--bg-surface);
+}
+
+.decision-trace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.decision-trace-header h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.decision-trace-stepper {
+  display: flex;
+  flex-direction: column;
+}
+
+.trace-step {
+  display: flex;
+  gap: var(--space-3);
+  position: relative;
+  padding-bottom: var(--space-4);
+}
+
+.trace-step:last-child {
+  padding-bottom: 0;
+}
+
+.trace-step-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.trace-step-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border-default);
+  margin-top: var(--space-1);
+}
+
+.trace-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.trace-step-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.trace-gate-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.trace-values {
+  color: var(--text-muted);
+}
+
+.trace-values strong {
+  color: var(--text-primary);
+}
+
+.trace-values code {
+  background: var(--bg-elevated);
+  padding: 1px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.trace-message {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.trace-step--pass .trace-step-line {
+  background: rgba(52, 211, 153, 0.2);
+}
+
+.trace-step--fail .trace-step-line {
+  background: rgba(248, 113, 113, 0.2);
+}

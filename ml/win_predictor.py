@@ -18,10 +18,23 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.calibration import CalibratedClassifierCV, calibration_curve
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
+
+try:
+    import xgboost as xgb
+    from xgboost import XGBClassifier
+    _HAS_XGBOOST = True
+except ImportError:
+    _HAS_XGBOOST = False
+
+try:
+    import lightgbm as lgb
+    _HAS_LIGHTGBM = True
+except ImportError:
+    _HAS_LIGHTGBM = False
 
 from ml.feature_engineering import DisputeFeatureExtractor
 from ml.model_registry import get_model_registry
@@ -33,6 +46,58 @@ ROOT = Path(__file__).resolve().parent.parent
 DATASET_PATH = ROOT / "outputs" / "synthetic_chargeback_dataset.json"
 MODEL_COMPARISON_PATH = ROOT / "outputs" / "model_comparison.json"
 MODEL_ARTIFACT_PATH = ROOT / "outputs" / "model_ensemble.pkl"
+
+
+def threshold_for_min_precision(
+    val_probs: np.ndarray,
+    y_val: np.ndarray,
+    min_precision: float = 0.45,
+    fallback_threshold: float = 0.35,
+) -> float:
+    """
+    Find the lowest probability threshold on the validation split that achieves
+    at least `min_precision`.
+    Returns the threshold as a rounded float.
+    """
+    from sklearn.metrics import precision_recall_curve
+
+    precisions, _, thresholds = precision_recall_curve(y_val, val_probs)
+    valid_indices = [i for i, p in enumerate(precisions[:-1]) if float(p) >= min_precision]
+    if valid_indices:
+        return round(float(thresholds[valid_indices[0]]), 4)
+    best_idx = int(np.argmax(precisions[:-1])) if len(thresholds) > 0 else 0
+    return round(float(thresholds[best_idx]), 4) if len(thresholds) > 0 else fallback_threshold
+
+
+def profit_optimal_threshold(
+    val_probs: np.ndarray,
+    y_val: np.ndarray,
+    amounts: list[float] | np.ndarray,
+    dispute_fee_inr: float = 500.0,
+) -> tuple[float, float]:
+    """
+    Compute threshold that directly maximises net financial profit:
+    Profit = sum_{i: p_i >= thr and y_i == 1} amount_i - sum_{i: p_i >= thr and y_i == 0} fee
+    Returns (best_threshold, max_profit_inr).
+    """
+    thr_grid = np.linspace(0.05, 0.95, 91)
+    best_thr = 0.35
+    best_profit = float("-inf")
+    for thr in thr_grid:
+        profit = 0.0
+        for i, p in enumerate(val_probs):
+            if p >= thr:
+                if y_val[i] == 1:
+                    profit += amounts[i]
+                else:
+                    profit -= dispute_fee_inr
+            else:
+                if y_val[i] == 1:
+                    profit -= amounts[i]  # forfeited win
+        if profit > best_profit:
+            best_profit = profit
+            best_thr = float(thr)
+    return round(best_thr, 4), round(best_profit, 2)
 
 _predictor_instance = None
 
@@ -67,6 +132,8 @@ class DisputeWinPredictor:
         # training so the test split is never touched during threshold selection.
         # None means "not yet found"; recommend_action() falls back to EV > 0.
         self.ev_optimal_threshold: float | None = None
+        self.category_thresholds: dict[str, float] = {}
+        self.min_precision_threshold: float = 0.45
         self.threshold_search_result: dict[str, Any] = {}
 
         self.X_train_arr: np.ndarray | None = None
@@ -77,7 +144,7 @@ class DisputeWinPredictor:
         self.y_val_arr: np.ndarray | None = None
         
         # Primary base model reference for linear SHAP / coefficients fallback
-        self.model = LogisticRegression(max_iter=1000, random_state=42)
+        self.model: Any = LogisticRegression(max_iter=1000, random_state=42)
         
         # Attempt to load pre-trained artifact from disk for fast startup
         if not force_retrain and self._load_persisted_model():
@@ -94,7 +161,11 @@ class DisputeWinPredictor:
         try:
             import sklearn
             MODEL_ARTIFACT_PATH.parent.mkdir(parents=True, exist_ok=True)
+            from datetime import datetime, timezone
             artifact = {
+                "version": "4.0.0",
+                "training_timestamp": datetime.now(timezone.utc).isoformat(),
+                "dataset_hash": hashlib.sha256(self.dataset_path.read_bytes()).hexdigest(),
                 "sklearn_version": sklearn.__version__,
                 "models": self.models,
                 "raw_models": self.raw_models,
@@ -106,12 +177,35 @@ class DisputeWinPredictor:
                 "precision": self.precision,
                 "recall": self.recall,
                 "X_train_arr": self.X_train_arr,
+                "y_train_arr": self.y_train_arr,
+                "X_val_arr": self.X_val_arr,
+                "y_val_arr": self.y_val_arr,
+                "X_test_arr": self.X_test_arr,
+                "y_test_arr": self.y_test_arr,
                 "model": self.model,
                 "ev_optimal_threshold": self.ev_optimal_threshold,
+                "category_thresholds": self.category_thresholds,
+                "min_precision_threshold": self.min_precision_threshold,
                 "threshold_search_result": self.threshold_search_result,
+                "training_config": {
+                    "class_weight_cost": {0: 1.0, 1: 5.0},
+                    "gbt_sample_weight": {0: 1.0, 1: 5.0},
+                    "models_trained": list(self.models.keys()),
+                    "lr_params": {"max_iter": 1000, "C": 1.0, "random_state": 42, "class_weight": {0: 1.0, 1: 5.0}},
+                    "gbt_params": {"n_estimators": 150, "max_depth": 3, "learning_rate": 0.06, "random_state": 42},
+                    "rf_params": {"n_estimators": 200, "max_depth": 6, "random_state": 42, "class_weight": {0: 1.0, 1: 5.0}},
+                    "xgb_params": {"n_estimators": 150, "max_depth": 4, "learning_rate": 0.05, "scale_pos_weight": 5.0, "random_state": 42},
+                    "calibration_method": "cv=3_calibrated_classifier_cv",
+                    "ev_threshold_method": "precision_recall_curve_ev_maximization_on_val_split",
+                    "random_seed": 42,
+                    "dataset_path": str(self.dataset_path),
+                },
             }
             joblib.dump(artifact, MODEL_ARTIFACT_PATH)
-            logger.info(f"Persisted model ensemble artifact to {MODEL_ARTIFACT_PATH} (sklearn {sklearn.__version__})")
+            # Write companion SHA-256 checksum sidecar file
+            checksum = hashlib.sha256(MODEL_ARTIFACT_PATH.read_bytes()).hexdigest()
+            MODEL_ARTIFACT_PATH.with_suffix(".pkl.sha256").write_text(checksum, encoding="utf-8")
+            logger.info(f"Persisted model ensemble artifact to {MODEL_ARTIFACT_PATH} (SHA-256: {checksum[:12]}..., sklearn {sklearn.__version__})")
         except Exception as exc:
             logger.warning(f"Failed to persist model artifact: {exc}")
 
@@ -122,20 +216,26 @@ class DisputeWinPredictor:
 
         try:
             import sklearn
-                # Verify model artifact integrity before loading
-                import hashlib, pathlib
-                expected_hash = os.getenv('MODEL_SHA256')
-                if expected_hash:
-                    actual_hash = hashlib.sha256(pathlib.Path(MODEL_ARTIFACT_PATH).read_bytes()).hexdigest()
-                    if actual_hash != expected_hash:
-                        logger.critical('Model checksum mismatch – refusing to load')
-                        raise RuntimeError('Corrupted model file')
-                # Load model safely (read‑only mmap to avoid execution)
-                artifact = joblib.load(MODEL_ARTIFACT_PATH, mmap_mode='r')
+            import hashlib, pathlib
+            actual_hash = hashlib.sha256(MODEL_ARTIFACT_PATH.read_bytes()).hexdigest()
+
+            # Verify model artifact integrity from sidecar or environment variable
+            expected_hash = os.getenv("MODEL_SHA256")
+            sidecar_path = MODEL_ARTIFACT_PATH.with_suffix(".pkl.sha256")
+            if not expected_hash and sidecar_path.exists():
+                expected_hash = sidecar_path.read_text(encoding="utf-8").strip()
+
+            if expected_hash and actual_hash != expected_hash:
+                logger.critical(f"Model checksum mismatch: expected {expected_hash}, got {actual_hash} – refusing to load")
+                raise RuntimeError("Corrupted model file: checksum verification failed")
+
+            # Load model safely (read‑only mmap to avoid execution)
+            artifact = joblib.load(MODEL_ARTIFACT_PATH, mmap_mode="r")
             saved_ver = artifact.get("sklearn_version")
-            if saved_ver != sklearn.__version__:
+            if saved_ver != sklearn.__version__ or len(artifact.get("feature_names", [])) != len(self.feature_names):
                 logger.warning(
-                    f"Persisted model artifact version ({saved_ver}) differs from environment ({sklearn.__version__}). Deleting stale artifact and retraining..."
+                    f"Persisted model artifact version ({saved_ver}) or feature count ({len(artifact.get('feature_names', []))}) "
+                    f"differs from current environment ({sklearn.__version__}, {len(self.feature_names)} features). Deleting stale artifact and retraining..."
                 )
                 try:
                     MODEL_ARTIFACT_PATH.unlink(missing_ok=True)
@@ -153,11 +253,21 @@ class DisputeWinPredictor:
             self.precision = artifact.get("precision", 0.90)
             self.recall = artifact.get("recall", 0.85)
             self.X_train_arr = artifact.get("X_train_arr")
+            self.y_train_arr = artifact.get("y_train_arr")
+            self.X_val_arr = artifact.get("X_val_arr")
+            self.y_val_arr = artifact.get("y_val_arr")
+            self.X_test_arr = artifact.get("X_test_arr")
+            self.y_test_arr = artifact.get("y_test_arr")
             self.model = artifact.get("model", LogisticRegression(max_iter=1000, random_state=42))
             self.ev_optimal_threshold = artifact.get("ev_optimal_threshold", None)
+            self.category_thresholds = artifact.get("category_thresholds", {})
+            self.min_precision_threshold = artifact.get("min_precision_threshold", 0.45)
             self.threshold_search_result = artifact.get("threshold_search_result", {})
+            self.training_config = artifact.get("training_config", {})
             self.is_trained = bool(self.models)
             return self.is_trained
+        except RuntimeError:
+            raise
         except Exception as exc:
             logger.warning(f"Error loading persisted model artifact: {exc}. Retraining...")
             try:
@@ -183,7 +293,12 @@ class DisputeWinPredictor:
                 load_reason_code_config,
                 score_evidence,
             )
+            from intelligence.dispute_velocity import compute_merchant_velocity_context
             rc_configs = load_reason_code_config(ROOT / "config" / "reason_codes")
+
+            vel_context = compute_merchant_velocity_context(cases)
+            for c in cases:
+                c["merchant_velocity"] = vel_context.get(c.get("dispute_id", ""), {})
 
             X_non_test = []
             y_non_test = []
@@ -200,6 +315,7 @@ class DisputeWinPredictor:
                     sc_res = score_evidence(required, statuses, docs, rc)
                     comp = sc_res["completeness_score"]
                     conf = compute_confidence(comp, statuses)
+                    c["completeness_score"] = comp
 
                     partial_res = {
                         "completeness_score": comp,
@@ -246,24 +362,102 @@ class DisputeWinPredictor:
             self.X_test_arr  = np.array(X_test) if X_test else self.X_train_arr
             self.y_test_arr  = np.array(y_test) if y_test else self.y_train_arr
 
-            # Initialize base estimators with class balancing for imbalanced dispute rates (~27% won)
-            raw_lr = LogisticRegression(max_iter=1000, random_state=42, C=1.0, class_weight="balanced")
-            raw_gbt = GradientBoostingClassifier(n_estimators=100, max_depth=3, learning_rate=0.08, random_state=42)
-            raw_rf = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42, class_weight="balanced")
+            # Dynamic cost-sensitive weights based on actual class imbalance
+            n_pos = int(self.y_train_arr.sum())
+            n_neg = len(self.y_train_arr) - n_pos
+            dynamic_scale = max(1.0, round(n_neg / max(n_pos, 1), 2))
+            class_weight_cost = {0: 1.0, 1: dynamic_scale}
+
+            # Monotonic constraints mapping for tree models (higher completeness, confidence, etc., should not decrease win probability)
+            mono_map = {
+                    "Completeness Score": 1,
+                    "Confidence Score": 1,
+                    "Missing Count": -1,
+                    "Weak Count": -1,
+                    "Has Critical Evidence": 1,
+                    "Semantic Relevance Mean": 1,
+                    "Evidence Completeness Ratio": 1,
+                    "Critical Evidence Present Count": 1,
+                    "Has All Critical Evidence": 1,
+                    "Any Critical Missing": -1,
+                    "Critical Evidence Missing Count": -1,
+            }
+            monotonic_constraints = tuple(mono_map.get(f, 0) for f in self.feature_names)
+
+            raw_lr = LogisticRegression(max_iter=1000, random_state=42, C=1.0, class_weight=class_weight_cost)
+            raw_gbt = HistGradientBoostingClassifier(max_iter=150, max_depth=3, learning_rate=0.06, random_state=42, monotonic_cst=monotonic_constraints)
+            raw_rf = RandomForestClassifier(n_estimators=200, max_depth=6, random_state=42, class_weight=class_weight_cost)
+
+            sample_weights = np.where(self.y_train_arr == 1, dynamic_scale, 1.0)
 
             self.raw_models = {"lr": raw_lr, "gbt": raw_gbt, "rf": raw_rf}
 
-            # Fit base models first
+            if _HAS_XGBOOST:
+                # XGBoost model with monotonic constraints (reuse same mapping)
+                xgb_mono_constraints = tuple(mono_map.get(f, 0) for f in self.feature_names)
+                raw_xgb = XGBClassifier(
+                    n_estimators=150,
+                    max_depth=4,
+                    learning_rate=0.05,
+                    scale_pos_weight=dynamic_scale,
+                    monotone_constraints=xgb_mono_constraints,
+                    random_state=42,
+                    eval_metric="logloss",
+                )
+                self.raw_models["xgb"] = raw_xgb
+
+            # ── OOF-based Stacking (Fix Leakage) ──────────────────────────────────
+            # Generate out-of-fold predictions on training set using StratifiedKFold
+            from sklearn.model_selection import cross_val_predict, StratifiedKFold
+            skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+            oof_preds = {}
+            for name, raw_model in self.raw_models.items():
+                try:
+                        oof_preds[name] = cross_val_predict(
+                            raw_model, self.X_train_arr, self.y_train_arr,
+                            cv=skf, method="predict_proba"
+                        )[:, 1]
+                except Exception as exc:
+                    logger.warning(f"OOF prediction failed for {name}: {exc}")
+
+            # Re-balance ensemble weighting toward higher-precision model using OOF predictions (no leakage)
+            oof_precs = {}
+            for name, oof_prob in oof_preds.items():
+                pred = (oof_prob >= 0.40).astype(int)
+                denom = max(int(pred.sum()), 1)
+                oof_precs[name] = max(0.01, float((pred & self.y_train_arr).sum()) / denom)
+
+            total_prec = sum(oof_precs.values())
+            if total_prec > 0:
+                self.ensemble_weights = {
+                    k: round(v / total_prec, 4) for k, v in oof_precs.items()
+                }
+            else:
+                self.ensemble_weights = (
+                    {"xgb": 0.35, "gbt": 0.25, "rf": 0.25, "lr": 0.15}
+                    if _HAS_XGBOOST else {"gbt": 0.40, "rf": 0.35, "lr": 0.25}
+                )
+
+            logger.info(
+                f"OOF-based precision-weighted ensemble (no leakage): {self.ensemble_weights} "
+                f"(OOF precisions: { {k: round(v, 4) for k, v in oof_precs.items()} })"
+            )
+
+            # Fit base models on full training data for deployment
             raw_lr.fit(self.X_train_arr, self.y_train_arr)
-            raw_gbt.fit(self.X_train_arr, self.y_train_arr)
+            raw_gbt.fit(self.X_train_arr, self.y_train_arr, sample_weight=sample_weights)
             raw_rf.fit(self.X_train_arr, self.y_train_arr)
-            self.model = raw_lr
+            if _HAS_XGBOOST:
+                raw_xgb.fit(self.X_train_arr, self.y_train_arr)
+                self.model = raw_xgb
+            else:
+                self.model = raw_gbt
 
             # Build Calibrated Classifiers (cv=3 for cross-validated probability calibration)
             self.models = {
-                "lr": CalibratedClassifierCV(estimator=raw_lr, cv=3),
-                "gbt": CalibratedClassifierCV(estimator=raw_gbt, cv=3),
-                "rf": CalibratedClassifierCV(estimator=raw_rf, cv=3),
+                k: CalibratedClassifierCV(estimator=m, cv=3)
+                for k, m in self.raw_models.items()
             }
 
             for name, cal_model in self.models.items():
@@ -271,13 +465,41 @@ class DisputeWinPredictor:
 
             self.is_trained = True
 
-            # Evaluate each model on test split (using economic break-even threshold ~0.30)
-            comparison_results = {}
+            # Extract normalized feature importance weights for UI
+            primary_tree = self.raw_models.get("xgb") or self.raw_models.get("gbt")
+            if primary_tree is not None and hasattr(primary_tree, "feature_importances_"):
+                tree_importances = primary_tree.feature_importances_
+                top_5_indices = np.argsort(tree_importances)[::-1][:5]
+                top_5_sum = sum(tree_importances[top_5_indices]) if sum(tree_importances[top_5_indices]) > 0 else 1.0
+                self.feature_importances_ = {
+                    self.feature_names[i]: round(float(tree_importances[i] / top_5_sum), 4)
+                    for i in top_5_indices
+                }
+            else:
+                self.feature_importances_ = {}
+
+            # ── EV-optimal threshold search on validation split ───────────────
+            # Must happen on validation split only — test split is never examined here.
+            eval_threshold = 0.35
+            if self.X_val_arr is not None and len(self.X_val_arr) >= 10:
+                eval_threshold = self.find_ev_optimal_threshold(
+                    X_val=self.X_val_arr,
+                    y_val=self.y_val_arr,
+                    val_cases_meta=val_cases_meta,
+                )
+            else:
+                logger.warning(
+                    "Validation split not available or too small for threshold search. "
+                    "Using EV break-even fallback (recommend_action EV > 0)."
+                )
+
+            # Evaluate each model on test split using the validation-derived threshold
+            comparison_results: dict[str, Any] = {}
             test_preds = {}
 
             for name, cal_model in self.models.items():
                 probs = cal_model.predict_proba(self.X_test_arr)[:, 1]
-                preds = (probs >= 0.30).astype(int)
+                preds = (probs >= eval_threshold).astype(int)
                 test_preds[name] = probs
 
                 has_both_classes = len(set(self.y_test_arr)) > 1
@@ -291,15 +513,15 @@ class DisputeWinPredictor:
                     "brier_score": round(brier, 4),
                     "precision": round(prec, 4),
                     "recall": round(rec, 4),
+                    "threshold_used": round(eval_threshold, 4),
                 }
 
-            # Calculate Stacked Ensemble Predictions
-            ensemble_probs = (
-                self.ensemble_weights["gbt"] * test_preds["gbt"]
-                + self.ensemble_weights["lr"] * test_preds["lr"]
-                + self.ensemble_weights["rf"] * test_preds["rf"]
-            )
-            ensemble_preds = (ensemble_probs >= 0.30).astype(int)
+            # Calculate Stacked Ensemble Predictions using learned weights
+            ensemble_probs = np.zeros(len(self.X_test_arr))
+            for m_name, m_preds in test_preds.items():
+                w = self.ensemble_weights.get(m_name, 1.0 / len(test_preds))
+                ensemble_probs += w * m_preds
+            ensemble_preds = (ensemble_probs >= eval_threshold).astype(int)
 
             has_both_classes = len(set(self.y_test_arr)) > 1
             ens_auc = float(roc_auc_score(self.y_test_arr, ensemble_probs)) if has_both_classes else 0.90
@@ -317,6 +539,7 @@ class DisputeWinPredictor:
                 "brier_score": self.brier_score,
                 "precision": self.precision,
                 "recall": self.recall,
+                "threshold_used": round(eval_threshold, 4),
                 "weights": self.ensemble_weights,
             }
 
@@ -346,32 +569,6 @@ class DisputeWinPredictor:
                     dataset_size=len(cases),
                 )
             registry.set_active_model("stacked_ensemble")
-
-            # Extract normalized feature importance weights for UI
-            gbt_importances = raw_gbt.feature_importances_
-            top_5_indices = np.argsort(gbt_importances)[::-1][:5]
-            top_5_sum = sum(gbt_importances[top_5_indices]) if sum(gbt_importances[top_5_indices]) > 0 else 1.0
-
-            self.feature_importances_ = {
-                self.feature_names[i]: round(float(gbt_importances[i] / top_5_sum), 4)
-                for i in top_5_indices
-            }
-
-            # ── EV-optimal threshold search on validation split ───────────────
-            # Must happen AFTER models are trained and BEFORE _save_model()
-            # so the threshold is persisted with the artifact.
-            # Uses val split only — test split is never examined here.
-            if self.X_val_arr is not None and len(self.X_val_arr) >= 10:
-                self.find_ev_optimal_threshold(
-                    X_val=self.X_val_arr,
-                    y_val=self.y_val_arr,
-                    val_cases_meta=val_cases_meta,
-                )
-            else:
-                logger.warning(
-                    "Validation split not available or too small for threshold search. "
-                    "Using EV break-even fallback (recommend_action EV > 0)."
-                )
 
             # Persist trained model to disk
             self._save_model()
@@ -437,14 +634,11 @@ class DisputeWinPredictor:
             return 0.5
 
         # ── ensemble probabilities on val ─────────────────────────────────────
-        prob_gbt = self.models["gbt"].predict_proba(X_val)[:, 1]
-        prob_lr  = self.models["lr"].predict_proba(X_val)[:, 1]
-        prob_rf  = self.models["rf"].predict_proba(X_val)[:, 1]
-        val_probs = (
-            self.ensemble_weights["gbt"] * prob_gbt
-            + self.ensemble_weights["lr"] * prob_lr
-            + self.ensemble_weights["rf"] * prob_rf
-        )
+        val_probs = np.zeros(len(X_val))
+        for m_name, model in self.models.items():
+            prob = model.predict_proba(X_val)[:, 1]
+            w = self.ensemble_weights.get(m_name, 1.0 / len(self.models))
+            val_probs += w * prob
 
         # ── candidate thresholds from PR curve ────────────────────────────────
         # precision_recall_curve returns thresholds in ascending order.
@@ -464,7 +658,7 @@ class DisputeWinPredictor:
         candidates = candidates[(candidates > 0.01) & (candidates < 0.99)]
 
         # ── EV at each candidate threshold ────────────────────────────────────
-        best_threshold = float(breakeven)  # safe default
+        best_threshold = breakeven  # safe default
         best_ev = float("-inf")
         ev_curve: list[dict[str, Any]] = []
 
@@ -473,19 +667,32 @@ class DisputeWinPredictor:
             total_ev = 0.0
             tp = fp = fn = tn = 0
 
-            for i, (pred, true_label) in enumerate(zip(preds, y_val)):
+            from api.middleware.rule_override import apply_safety_net
+            for i, true_label in enumerate(y_val):
                 amt = float(val_cases_meta[i].get("transaction", {}).get("amount", avg_amount))
-                if pred == 1 and true_label == 1:
+                cat = val_cases_meta[i].get("reason_category", "")
+                comp_val = float(val_cases_meta[i].get("completeness_score", 0.0))
+                action = apply_safety_net(
+                    dispute=val_cases_meta[i],
+                    category=cat,
+                    amount_inr=amt,
+                    model_score=float(val_probs[i]),
+                    model_threshold=float(t),
+                    completeness_score=comp_val,
+                )
+                effective_pred = 1 if action == "CONTEST" else 0
+
+                if effective_pred == 1 and true_label == 1:
                     total_ev += amt              # TP: recovered disputed amount
                     tp += 1
-                elif pred == 1 and true_label == 0:
-                    total_ev -= dispute_fee_inr  # FP: wasted ₹500 fee
+                elif effective_pred == 1 and true_label == 0:
+                    total_ev -= dispute_fee_inr  # FP: wasted Rs 500 fee
                     fp += 1
-                elif pred == 0 and true_label == 1:
+                elif effective_pred == 0 and true_label == 1:
                     total_ev -= amt              # FN: forfeited the disputed amount
                     fn += 1                      # (we could have won but didn't contest)
                 else:
-                    tn += 1                      # TN: correct abstention, ₹0 impact
+                    tn += 1                      # TN: correct abstention, Rs 0 impact
 
             prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
             rec  = tp / (tp + fn) if (tp + fn) > 0 else 0.0
@@ -498,9 +705,35 @@ class DisputeWinPredictor:
                 "contested": tp + fp,
             })
 
-            if total_ev > best_ev:
-                best_ev = total_ev
-                best_threshold = float(t)
+        # Minimum-precision threshold (target >= 45% precision on validation split)
+        # We use 0.45 rather than 0.55 because the FN cost (forfeited dispute amount)
+        # massively outweighs the FP cost (Rs500 fee).  Contesting a dispute that loses
+        # costs Rs500; missing a winnable Rs10k dispute costs Rs10k.  The EV-maximising
+        # precision floor is closer to 0.45 than 0.55 for Indian chargeback data.
+        min_prec_thr = threshold_for_min_precision(val_probs, y_val, min_precision=0.45)
+        self.min_precision_threshold = min_prec_thr
+
+        # Profit-optimal threshold directly maximising net profit
+        profit_thr, max_profit = profit_optimal_threshold(val_probs, y_val, amounts, dispute_fee_inr)
+        self.profit_optimal_threshold = profit_thr
+
+        # Prioritize candidates with precision >= 45% that maximize Expected Value (Rs)
+        # 45% floor ensures we don't contest everything blindly while still catching
+        # enough winnable disputes to beat the naive always-contest baseline on EV.
+        valid_precision_candidates = [e for e in ev_curve if e["precision"] >= 0.45]
+        if not valid_precision_candidates:
+            valid_precision_candidates = [e for e in ev_curve if e["precision"] >= 0.40]
+
+        if valid_precision_candidates:
+            best_entry = max(valid_precision_candidates, key=lambda x: x["total_ev_inr"])
+            best_threshold = float(best_entry["threshold"])
+            best_ev = float(best_entry["total_ev_inr"])
+        else:
+            # Fallback to candidate that maximizes EV
+            if ev_curve:
+                best_entry = max(ev_curve, key=lambda x: x["total_ev_inr"])
+                best_threshold = float(best_entry["threshold"])
+                best_ev = float(best_entry["total_ev_inr"])
 
         self.ev_optimal_threshold = round(best_threshold, 4)
 
@@ -511,6 +744,7 @@ class DisputeWinPredictor:
         )
         self.threshold_search_result = {
             "chosen_threshold": self.ev_optimal_threshold,
+            "min_precision_threshold": self.min_precision_threshold,
             "val_total_ev_inr": round(best_ev, 2),
             "val_n_cases": len(val_cases_meta),
             "val_precision_at_threshold": chosen.get("precision", 0.0),
@@ -523,21 +757,55 @@ class DisputeWinPredictor:
             "avg_disputed_amount_inr": round(avg_amount, 2),
             "breakeven_threshold": round(breakeven, 4),
             "n_candidates_evaluated": len(candidates),
-            "method": "precision_recall_curve on validation split, EV maximisation",
+            "method": "precision_recall_curve with min_precision=0.45 and EV maximisation",
+            "ev_curve": ev_curve,
             "note": (
-                "Threshold chosen to maximise total ₹ EV on the validation split. "
-                "FP cost = ₹500 dispute fee. FN cost = full disputed amount forfeited "
-                "(merchant could have won but accepted loss). "
+                "Threshold chosen to enforce >= 45% precision while maximizing total Rs EV on the validation split. "
+                "FP cost = Rs 500 dispute fee. FN cost = full disputed amount forfeited. "
+                "A 45% precision floor is appropriate because FN cost >> FP cost for Indian chargeback data. "
                 "Test split was never examined during threshold selection."
             ),
         }
+
+        # Compute cost-minimizing threshold per category
+        category_thresholds: dict[str, float] = {}
+        for cat in set(c.get("reason_category", "") for c in val_cases_meta):
+            if not cat:
+                continue
+            cat_indices = [i for i, c in enumerate(val_cases_meta) if c.get("reason_category") == cat]
+            if len(cat_indices) >= 3:
+                c_probs = val_probs[cat_indices]
+                c_y = y_val[cat_indices]
+                c_amts = amounts[cat_indices]
+                best_cat_t = self.ev_optimal_threshold
+                min_cost = float("inf")
+                for ct in np.linspace(0.15, 0.65, 51):
+                    # FP cost = Rs 500 fee, FN cost = full amount forfeited
+                    fp_cost = sum(dispute_fee_inr for p, y in zip(c_probs, c_y) if p >= ct and y == 0)
+                    fn_cost = sum(amt for p, y, amt in zip(c_probs, c_y, c_amts) if p < ct and y == 1)
+                    cost = fp_cost + fn_cost
+                    if cost < min_cost:
+                        min_cost = cost
+                        best_cat_t = round(float(ct), 4)
+                category_thresholds[cat] = best_cat_t
+            else:
+                category_thresholds[cat] = self.ev_optimal_threshold
+
+        self.category_thresholds = category_thresholds
+        cat_thresh_file = ROOT / "config" / "category_thresholds.json"
+        try:
+            cat_thresh_file.parent.mkdir(parents=True, exist_ok=True)
+            cat_thresh_file.write_text(json.dumps(category_thresholds, indent=2), encoding="utf-8")
+        except Exception as exc:
+            logger.warning(f"Could not persist category_thresholds.json: {exc}")
 
         logger.info(
             f"EV-optimal threshold: {self.ev_optimal_threshold:.4f} "
             f"(val EV=₹{best_ev:,.0f}, "
             f"prec={chosen.get('precision', 0):.1%}, "
             f"rec={chosen.get('recall', 0):.1%}, "
-            f"breakeven={breakeven:.4f})"
+            f"breakeven={breakeven:.4f}, "
+            f"per-category: {self.category_thresholds})"
         )
         return self.ev_optimal_threshold
 
@@ -554,17 +822,26 @@ class DisputeWinPredictor:
 
         features = np.array([self._extract_features(dispute, scoring_result)])
         
-        prob_gbt = float(self.models["gbt"].predict_proba(features)[0][1])
-        prob_lr = float(self.models["lr"].predict_proba(features)[0][1])
-        prob_rf = float(self.models["rf"].predict_proba(features)[0][1])
+        ensemble_prob = 0.0
+        for m_name, model in self.models.items():
+            prob = float(model.predict_proba(features)[0][1])
+            w = self.ensemble_weights.get(m_name, 1.0 / len(self.models))
+            ensemble_prob += w * prob
 
-        ensemble_prob = (
-            self.ensemble_weights["gbt"] * prob_gbt
-            + self.ensemble_weights["lr"] * prob_lr
-            + self.ensemble_weights["rf"] * prob_rf
-        )
+        # Critical evidence missing hard-penalty check:
+        # If critical evidence (weight >= 0.20) is missing, hard-cap win probability at 0.15
+        evidence_elements = scoring_result.get("evidence_elements", {})
+        if evidence_elements and isinstance(evidence_elements, dict):
+            critical_missing = any(
+                isinstance(detail, dict)
+                and detail.get("status") == "missing"
+                and float(detail.get("weight", 0.0)) >= 0.20
+                for detail in evidence_elements.values()
+            )
+            if critical_missing:
+                ensemble_prob = min(ensemble_prob, 0.15)
 
-        return round(float(ensemble_prob), 4)
+        return round(ensemble_prob, 4)
 
     def calculate_expected_financial_value(
         self,
@@ -590,39 +867,34 @@ class DisputeWinPredictor:
         amount_inr: float,
         win_probability: float,
         dispute_fee: float = 500.0,
+        category: str | None = None,
+        dispute: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
-        Contest vs. Accept Economic Decision Engine.
-
-        Decision rule
-        -------------
-        If an EV-optimal threshold was found on the validation split during
-        training, CONTEST when win_probability >= ev_optimal_threshold.
-
-        Fallback (no threshold available): CONTEST when the raw EV is positive:
-            EV = P(Win) * amount - (1 - P(Win)) * fee > 0
-            ↔  P(Win) > fee / (amount + fee)   [break-even threshold]
-
-        Why not always use EV > 0?
-        --------------------------
-        The EV > 0 rule uses per-dispute amount as the implicit threshold, which
-        varies case by case (₹399 dispute → threshold ~0.56; ₹49,999 → ~0.01).
-        On a ₹9k average dispute the break-even is ~0.05 — nearly everything
-        contests. The EV-optimal threshold found on the validation split is a
-        single, stable, principled cut-point that accounts for the model's actual
-        calibration and the observed precision/recall trade-off.
+        Contest vs. Accept Economic Decision Engine with Rule-Based Safety Net.
         """
         ev_contest = (win_probability * amount_inr) - ((1.0 - win_probability) * dispute_fee)
 
-        if self.ev_optimal_threshold is not None:
-            should_contest = win_probability >= self.ev_optimal_threshold
-            threshold_used = self.ev_optimal_threshold
-            threshold_source = "ev_optimal (validation split)"
-        else:
-            # Fallback: per-dispute EV break-even
-            should_contest = ev_contest > 0.0
-            threshold_used = round(dispute_fee / (amount_inr + dispute_fee), 4) if amount_inr > 0 else 0.5
-            threshold_source = "ev_breakeven (fallback — no val threshold available)"
+        # Check rule override / safety net for high-value and low-value disputes
+        from api.middleware.rule_override import apply_safety_net
+        # Use per-category threshold if available, otherwise fallback to global EV-optimal threshold
+        cat_thresh = self.category_thresholds.get(category) if hasattr(self, "category_thresholds") and category else None
+        active_hurdle = cat_thresh if cat_thresh is not None else (self.ev_optimal_threshold if self.ev_optimal_threshold is not None else 0.35)
+
+        action = apply_safety_net(
+            dispute=dispute,
+            category=category,
+            amount_inr=amount_inr,
+            model_score=win_probability,
+            model_threshold=active_hurdle,
+        )
+        should_contest = (action == "CONTEST")
+        threshold_used = active_hurdle
+        threshold_source = "safety_net_and_ev_hurdle"
+        reason = (
+            f"Decision {action}: P(Win)={win_probability:.1%}, Amount=Rs {amount_inr:,.0f}, "
+            f"EV=Rs {ev_contest:,.2f} against calibrated hurdle {active_hurdle:.4f}."
+        )
 
         return {
             "action": "CONTEST" if should_contest else "ACCEPT_LOSS",
@@ -631,11 +903,7 @@ class DisputeWinPredictor:
             "threshold_used": threshold_used,
             "threshold_source": threshold_source,
             "fee_saved_if_accepted": dispute_fee if not should_contest else 0.0,
-            "reason": (
-                f"P(Win)={win_probability:.1%} ≥ threshold {threshold_used:.4f} → contest recommended (EV ₹{ev_contest:,.2f})."
-                if should_contest
-                else f"P(Win)={win_probability:.1%} < threshold {threshold_used:.4f} → accept loss to save ₹{dispute_fee:,.0f} fee (EV ₹{ev_contest:,.2f})."
-            ),
+            "reason": reason,
         }
 
     def get_local_shap_explanation(
@@ -651,22 +919,52 @@ class DisputeWinPredictor:
             feature_vec = np.array([self._extract_features(dispute, scoring_result)])
             predicted_prob = self.predict_win_probability(dispute, scoring_result)
 
-            raw_lr = self.raw_models.get("lr", self.model)
-            train_probs = raw_lr.predict_proba(self.X_train_arr)[:, 1]
-            base_value = float(np.mean(train_probs))
+            tree_model = self.raw_models.get("xgb") or self.raw_models.get("gbt")
+            shap_contribs = None
+            base_value = 0.35
 
-            # Signed contributions: coef * feature_value
-            raw_contribs = raw_lr.coef_[0] * feature_vec[0]
+            if tree_model is not None:
+                try:
+                    import shap
+                    explainer = shap.TreeExplainer(tree_model)
+                    sv = explainer.shap_values(feature_vec)
+                    if isinstance(sv, list) and len(sv) == 2:
+                        vals = sv[1][0]
+                    elif getattr(sv, "ndim", 0) == 3 and sv.shape[2] == 2:
+                        vals = sv[0, :, 1]
+                    elif getattr(sv, "ndim", 0) == 2:
+                        vals = sv[0]
+                    else:
+                        vals = np.array(sv).flatten()
+                    ev_raw = explainer.expected_value
+                    if isinstance(ev_raw, (list, np.ndarray)):
+                        base_val = float(ev_raw[1] if len(ev_raw) > 1 else ev_raw[0])
+                    else:
+                        base_val = float(ev_raw)
+                    if base_val > 1.0 or base_val < 0.0:
+                        base_value = 1.0 / (1.0 + np.exp(-base_val))
+                    else:
+                        base_value = base_val
+                    shap_contribs = vals.tolist()
+                except Exception as shap_exc:
+                    logger.debug(f"TreeExplainer exception, falling back: {shap_exc}")
+
+            if shap_contribs is None:
+                raw_lr = self.raw_models.get("lr") or self.model
+                if raw_lr is not None and hasattr(raw_lr, "coef_") and hasattr(raw_lr, "predict_proba"):
+                    train_probs = raw_lr.predict_proba(self.X_train_arr)[:, 1]
+                    base_value = float(np.mean(train_probs))
+                    shap_contribs = (raw_lr.coef_[0] * feature_vec[0]).tolist()
+                else:
+                    base_value = 0.5
+                    shap_contribs = [0.0] * len(self.feature_names)
 
             return {
-                "feature_names": self.feature_names,
-                "feature_vector": feature_vec[0].tolist(),
-                "shap_values": raw_contribs.tolist(),
-                "base_value": round(base_value, 4),
+                "feature_names": list(self.feature_names),
+                "feature_vector": [float(x) for x in feature_vec[0]],
+                "shap_values": [float(x) for x in shap_contribs],
+                "base_value": round(float(base_value), 4),
                 "predicted_prob": round(predicted_prob, 4),
-                "x_train": self.X_train_arr,
-                "model": raw_lr,
-                "instance": feature_vec,
             }
         except Exception as exc:
             logger.debug(f"Error computing local SHAP explanation: {exc}")

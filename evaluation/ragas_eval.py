@@ -157,8 +157,17 @@ def evaluate_answer_correctness(
     }
 
 
+def _get_weight(val: Any) -> float:
+    if isinstance(val, dict):
+        return float(val.get("weight", 0.2))
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return 0.2
+
+
 def evaluate_evidence_recall_at_k(
-    required_evidence: dict[str, float],
+    required_evidence: dict[str, Any],
     evidence_statuses: dict[str, str],
     k: int = 5,
 ) -> dict[str, Any]:
@@ -171,16 +180,17 @@ def evaluate_evidence_recall_at_k(
         return {"recall_at_k": 1.0, "weighted_recall_at_k": 1.0, "top_k_items": []}
 
     # Sort required items by weight descending
-    sorted_items = sorted(required_evidence.items(), key=lambda x: x[1], reverse=True)
+    sorted_items = sorted(required_evidence.items(), key=lambda x: _get_weight(x[1]), reverse=True)
     top_k = sorted_items[:k]
 
     top_k_keys = [item[0] for item in top_k]
-    total_top_k_weight = sum(item[1] for item in top_k)
+    total_top_k_weight = sum(_get_weight(item[1]) for item in top_k)
 
     detected_count = 0
     detected_weight = 0.0
 
-    for ev_id, weight in top_k:
+    for ev_id, raw_weight in top_k:
+        weight = _get_weight(raw_weight)
         status = evidence_statuses.get(ev_id, "missing")
         if status == "present":
             detected_count += 1
@@ -204,7 +214,7 @@ def evaluate_evidence_recall_at_k(
 
 def evaluate_mrr_gap_recommendations(
     gap_analysis: list[dict[str, Any]],
-    required_evidence: dict[str, float],
+    required_evidence: dict[str, Any],
     evidence_statuses: dict[str, str],
 ) -> float:
     """
@@ -218,7 +228,7 @@ def evaluate_mrr_gap_recommendations(
 
     # Find the ground truth highest-impact missing item (largest weight with status != 'present')
     missing_items = [
-        (ev_id, weight)
+        (ev_id, _get_weight(weight))
         for ev_id, weight in required_evidence.items()
         if evidence_statuses.get(ev_id, "missing") != "present"
     ]
@@ -273,12 +283,12 @@ def run_ragas_evaluation(
 
     for case in cases:
         dispute_id = case.get("dispute_id", "disp_unknown")
-        rc_key = case.get("reason_code")
+        rc_key = case.get("reason_category") or case.get("reason_code")
         rc_config = reason_configs.get(rc_key, {})
         required_evidence = rc_config.get("required_evidence", {})
 
         # Score dispute
-        scoring_res = score_single_dispute(case, rc_config)
+        scoring_res = score_single_dispute(case, reason_configs)
         predicted_route = scoring_res.get("routing_decision", "human_review")
         expected_route = case.get("expected_route", "human_review")
 
