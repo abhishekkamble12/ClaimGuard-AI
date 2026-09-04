@@ -96,7 +96,7 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(webhook_router)
 app.include_router(disputes_router)
-app.include_router(dataset_router)
+app.include_router(drift_router)
 app.include_router(portfolio_router)
 app.include_router(v1_drift_router)
 app.include_router(feedback_router)
