@@ -577,5 +577,23 @@ ProofPilot (ClaimGuard-AI)
 
 ---
 
+## 🛡️ Git Best Practices & Clean Commits
+
+To ensure clean version control and avoid pushing unwanted build artifacts, dependency directories, or audit log dumps to GitHub:
+
+- **Configured `.gitignore`**: Excludes `node_modules/`, Python virtual environments (`.venv/`, `venv/`), temporary scratch scripts (`scratch/`), runtime audit log dumps (`outputs/audit_logs/`), and environment files (`.env`).
+- **Recommended Staging Commands**:
+  ```bash
+  # Stage core project code and documentation safely
+  git add api/ frontend/ ml/ extraction/ evaluation/ data/ config/ intelligence/ scoring/ README.md DEMO.md plan.md requirements.txt .gitignore
+
+  # Commit & push
+  git commit -m "Update core features and updates"
+  git push origin main
+  ```
+
+---
+
 ## 📜 License
 MIT License. Built with pride for the Razorpay AI Buildathon 2026.
+
